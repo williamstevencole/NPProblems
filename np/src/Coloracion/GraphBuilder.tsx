@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import mapaSinnoh from "../assets/mapa-sinnoh.png";
-import { ciudades, type Ciudad } from "./ciudades";
+import { ciudades, getColorVisual, conexiones } from "./ciudades";
+import PokemonDialog from "./pokemonDialog";
+import { dialogos, type Mensaje } from "./GiovanniDialog";
 
 export default function GraphBuilder() {
   const [grafo, setGrafo] = useState<{ [key: string]: string[] }>({});
@@ -8,6 +10,10 @@ export default function GraphBuilder() {
   const [hoveredCiudad, setHoveredCiudad] = useState<string | null>(null);
   const textRefs = useRef<Record<string, SVGTextElement | null>>({});
   const [labelWidths, setLabelWidths] = useState<Record<string, number>>({});
+
+  const [dialogoActivo, setDialogoActivo] = useState<Mensaje[] | null>(
+    dialogos.inicio
+  );
 
   useEffect(() => {
     const newWidths: Record<string, number> = {};
@@ -21,24 +27,29 @@ export default function GraphBuilder() {
   }, [hoveredCiudad]);
 
   const handleCiudadClick = (nombre: string) => {
+    setDialogoActivo(dialogos.seleccionCiudad(nombre));
     if (ciudadAnterior && ciudadAnterior !== nombre) {
-      setGrafo((prev) => {
-        const actualizado = { ...prev };
-        actualizado[ciudadAnterior] = [
-          ...(actualizado[ciudadAnterior] || []),
-          nombre,
-        ];
-        actualizado[nombre] = [...(actualizado[nombre] || []), ciudadAnterior];
-        return actualizado;
-      });
+      const validos = conexiones[ciudadAnterior] || [];
+      if (validos.includes(nombre)) {
+        setGrafo((prev) => {
+          const actualizado = { ...prev };
+          actualizado[ciudadAnterior] = [
+            ...(actualizado[ciudadAnterior] || []),
+            nombre,
+          ];
+          actualizado[nombre] = [
+            ...(actualizado[nombre] || []),
+            ciudadAnterior,
+          ];
+          return actualizado;
+        });
+      } else {
+        alert("Estas ciudades no están directamente conectadas.");
+      }
       setCiudadAnterior(null);
     } else {
       setCiudadAnterior(nombre);
     }
-  };
-
-  const getColorVisual = (ciudad: Ciudad): string => {
-    return ciudad.color === "blue" ? "#2563eb" : "#dc2626";
   };
 
   return (
@@ -111,13 +122,17 @@ export default function GraphBuilder() {
                     rx={5}
                   />
                   <text
-                    ref={(el) => (textRefs.current[ciudad.nombre] = el)}
+                    ref={(el) => {
+                      if (el) {
+                        textRefs.current[ciudad.nombre] = el;
+                      }
+                    }}
                     x={cx + 18}
                     y={cy}
                     fontSize="14"
                     fontWeight="bold"
                     fill="white"
-                    fontFamily="sans-serif"
+                    fontFamily="pokemon-dp-pro"
                     textAnchor="start"
                   >
                     {ciudad.nombre}
@@ -128,6 +143,12 @@ export default function GraphBuilder() {
           );
         })}
       </svg>
+      {dialogoActivo && (
+        <PokemonDialog
+          mensajes={dialogoActivo}
+          onClose={() => setDialogoActivo(null)}
+        />
+      )}
     </div>
   );
 }

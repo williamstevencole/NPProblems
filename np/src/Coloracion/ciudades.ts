@@ -31,3 +31,36 @@ export const ciudades: Ciudad[] = [
   { nombre: "Survival Area", top: "28.5%", left: "62.2%", color: "blue" },
   { nombre: "Resort Area", top: "41.8%", left: "72.8%", color: "blue" },
 ];
+
+export const getColorVisual = (ciudad: Ciudad): string => {
+  return ciudad.color === "blue" ? "#2563eb" : "#dc2626";
+};
+
+export const conexiones: { [ciudad: string]: string[] } = {
+  "Twinleaf Town": ["Sandgem Town"],
+  "Sandgem Town": ["Twinleaf Town", "Jubilife City"],
+  "Jubilife City": [
+    "Sandgem Town",
+    "Oreburgh City",
+    "Floaroma Town",
+    "Canalave City",
+  ],
+  "Oreburgh City": ["Jubilife City", "Mt. Coronet"],
+  "Floaroma Town": ["Jubilife City", "Eterna City"],
+  "Eterna Forest": ["Floaroma Town", "Eterna City"],
+  "Eterna City": ["Floaroma Town", "Celestic Town", "Mt. Coronet"],
+  "Celestic Town": ["Eterna City", "Hearthome City"],
+  "Hearthome City": ["Celestic Town", "Solaceon Town", "Pastoria City"],
+  "Solaceon Town": ["Hearthome City", "Veilstone City"],
+  "Veilstone City": ["Solaceon Town", "Pastoria City"],
+  "Pastoria City": ["Hearthome City", "Veilstone City", "Sunyshore City"],
+  "Sunyshore City": ["Pastoria City", "Pokémon League"],
+  "Pokémon League": ["Sunyshore City"],
+  "Canalave City": ["Jubilife City"],
+  "Snowpoint City": ["Acuity Lakefront"],
+  "Acuity Lakefront": ["Snowpoint City"],
+  "Fight Area": ["Survival Area", "Resort Area"],
+  "Survival Area": ["Fight Area"],
+  "Resort Area": ["Fight Area"],
+  "Mt. Coronet": ["Oreburgh City", "Eterna City"],
+};
