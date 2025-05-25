@@ -2,15 +2,18 @@ import { useState, useRef, useEffect } from "react";
 import mapaSinnoh from "../assets/mapa-sinnoh.png";
 import { ciudades, getColorVisual, conexiones } from "./ciudades";
 import PokemonDialog from "./pokemonDialog";
-import { dialogos, type Mensaje } from "./GiovanniDialog";
+import {
+  dialogos,
+  type Mensaje,
+  getDialogoErrorConexion,
+} from "./GiovanniDialog";
 
 export default function GraphBuilder() {
   const [grafo, setGrafo] = useState<{ [key: string]: string[] }>({});
-  const [ciudadAnterior, setCiudadAnterior] = useState<string | null>(null);
+  const [seleccionadas, setSeleccionadas] = useState<string[]>([]);
   const [hoveredCiudad, setHoveredCiudad] = useState<string | null>(null);
   const textRefs = useRef<Record<string, SVGTextElement | null>>({});
   const [labelWidths, setLabelWidths] = useState<Record<string, number>>({});
-
   const [dialogoActivo, setDialogoActivo] = useState<Mensaje[] | null>(
     dialogos.inicio
   );
@@ -27,29 +30,33 @@ export default function GraphBuilder() {
   }, [hoveredCiudad]);
 
   const handleCiudadClick = (nombre: string) => {
-    setDialogoActivo(dialogos.seleccionCiudad(nombre));
-    if (ciudadAnterior && ciudadAnterior !== nombre) {
-      const validos = conexiones[ciudadAnterior] || [];
-      if (validos.includes(nombre)) {
-        setGrafo((prev) => {
-          const actualizado = { ...prev };
-          actualizado[ciudadAnterior] = [
-            ...(actualizado[ciudadAnterior] || []),
-            nombre,
-          ];
-          actualizado[nombre] = [
-            ...(actualizado[nombre] || []),
-            ciudadAnterior,
-          ];
-          return actualizado;
-        });
-      } else {
-        alert("Estas ciudades no están directamente conectadas.");
-      }
-      setCiudadAnterior(null);
-    } else {
-      setCiudadAnterior(nombre);
+    // Si es la primera ciudad
+    if (seleccionadas.length === 0) {
+      setSeleccionadas([nombre]);
+      setDialogoActivo(dialogos.seleccionCiudad(nombre));
+      return;
     }
+    // Verifica si tiene conexión con alguna seleccionada
+    const conexionesConSeleccionadas = (conexiones[nombre] || []).filter((c) =>
+      seleccionadas.includes(c)
+    );
+    if (conexionesConSeleccionadas.length === 0) {
+      setDialogoActivo(
+        getDialogoErrorConexion(nombre, seleccionadas, conexiones)
+      );
+      return;
+    }
+    // Agrega la ciudad y conecta con todas las seleccionadas conectadas
+    setSeleccionadas((prev) => [...prev, nombre]);
+    setGrafo((prev) => {
+      const actualizado = { ...prev };
+      conexionesConSeleccionadas.forEach((c) => {
+        actualizado[c] = [...(actualizado[c] || []), nombre];
+        actualizado[nombre] = [...(actualizado[nombre] || []), c];
+      });
+      return actualizado;
+    });
+    setDialogoActivo(dialogos.seleccionCiudad(nombre));
   };
 
   return (
@@ -59,7 +66,12 @@ export default function GraphBuilder() {
         preserveAspectRatio="xMidYMid slice"
         className="w-full h-full"
       >
-        <image href={mapaSinnoh} width="1268" height="734" />
+        <image
+          href={mapaSinnoh}
+          width="1268"
+          height="734"
+          className="w-full h-full "
+        />
 
         {Object.entries(grafo).flatMap(([origen, destinos]) => {
           const ciudadOrigen = ciudades.find((c) => c.nombre === origen);
@@ -106,7 +118,9 @@ export default function GraphBuilder() {
                 cy={cy}
                 r="6"
                 fill={
-                  ciudad.nombre === ciudadAnterior ? "#facc15" : backgroundColor
+                  seleccionadas.includes(ciudad.nombre)
+                    ? "#facc15"
+                    : backgroundColor
                 }
                 stroke="white"
                 strokeWidth="2"

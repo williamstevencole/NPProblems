@@ -1,5 +1,7 @@
 //blue if in right location, red if not
 
+import type { Mensaje } from "./GiovanniDialog";
+
 export type Ciudad = {
   nombre: string;
   top: string;
@@ -45,13 +47,34 @@ export const conexiones: { [ciudad: string]: string[] } = {
     "Floaroma Town",
     "Canalave City",
   ],
-  "Oreburgh City": ["Jubilife City", "Mt. Coronet"],
-  "Floaroma Town": ["Jubilife City", "Eterna City"],
+  "Oreburgh City": [
+    "Jubilife City",
+    "Mount Coronet",
+    "Eterna City",
+    "Hearthome City",
+  ],
+  "Floaroma Town": ["Jubilife City", "Eterna City", "Eterna Forest"],
   "Eterna Forest": ["Floaroma Town", "Eterna City"],
-  "Eterna City": ["Floaroma Town", "Celestic Town", "Mt. Coronet"],
-  "Celestic Town": ["Eterna City", "Hearthome City"],
-  "Hearthome City": ["Celestic Town", "Solaceon Town", "Pastoria City"],
-  "Solaceon Town": ["Hearthome City", "Veilstone City"],
+  "Eterna City": [
+    "Floaroma Town",
+    "Celestic Town",
+    "Mount Coronet",
+    "Oreburgh City",
+  ],
+  "Celestic Town": [
+    "Eterna City",
+    "Hearthome City",
+    "Solaceon Town",
+    "Oreburgh City",
+  ],
+  "Hearthome City": [
+    "Celestic Town",
+    "Solaceon Town",
+    "Pastoria City",
+    "Oreburgh City",
+    "Mount Coronet",
+  ],
+  "Solaceon Town": ["Hearthome City", "Veilstone City", "Celestic Town"],
   "Veilstone City": ["Solaceon Town", "Pastoria City"],
   "Pastoria City": ["Hearthome City", "Veilstone City", "Sunyshore City"],
   "Sunyshore City": ["Pastoria City", "Pokémon League"],
@@ -62,5 +85,30 @@ export const conexiones: { [ciudad: string]: string[] } = {
   "Fight Area": ["Survival Area", "Resort Area"],
   "Survival Area": ["Fight Area"],
   "Resort Area": ["Fight Area"],
-  "Mt. Coronet": ["Oreburgh City", "Eterna City"],
+  "Mount Coronet": [
+    "Oreburgh City",
+    "Eterna City",
+    "Celestic Town",
+    "Hearthome City",
+    "Mount Coronet",
+  ],
 };
+
+export const getDialogoErrorConexion = (
+  ciudad: string,
+  seleccionadas: string[],
+  conexiones: { [ciudad: string]: string[] }
+): Mensaje[] => [
+  {
+    speaker: "Giovanni",
+    text: `¡Error! ${ciudad} no tiene conexión con ninguna de las ciudades seleccionadas.`,
+  },
+  ...seleccionadas.map((c) => ({
+    speaker: "Giovanni",
+    text: `${c}: ${
+      (conexiones[c] || [])
+        .filter((conn) => seleccionadas.includes(conn))
+        .join(", ") || "Sin conexiones"
+    }`,
+  })),
+];

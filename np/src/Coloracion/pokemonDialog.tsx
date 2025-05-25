@@ -49,6 +49,11 @@ export default function PokemonDialog({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter") {
         avanzar();
+      } else if (e.key === "Shift") {
+        //saltar a despues del ultimo mensaje
+        setIndex(mensajes.length - 1);
+        setTypedText(mensajes[mensajes.length - 1].text);
+        setIsTyping(true);
       }
     };
     window.addEventListener("keydown", handleKeyDown);

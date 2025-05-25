@@ -199,3 +199,22 @@ export const dialogos = {
     fracaso: dialogoFracaso,
   },
 };
+
+export const getDialogoErrorConexion = (
+  ciudad: string,
+  seleccionadas: string[],
+  conexiones: { [ciudad: string]: string[] }
+): Mensaje[] => [
+  {
+    speaker: "Giovanni" as const,
+    text: `¡Error! ${ciudad} no tiene conexión con ninguna de las ciudades seleccionadas.`,
+  },
+  ...seleccionadas.map((c) => ({
+    speaker: "Giovanni" as const,
+    text: `${c}: ${
+      (conexiones[c] || [])
+        .filter((conn) => seleccionadas.includes(conn))
+        .join(", ") || "Sin conexiones"
+    }`,
+  })),
+];
