@@ -73,18 +73,17 @@ export default function PokemonDialog({
         }}
         onClick={avanzar}
       >
-        <div className="absolute inset-0 px-20 pt-10 font-[pokemon-dp-pro] text-black text-4xl font-extrabold leading-snug pointer-events-none flex flex-col justify-center">
+        <div className="absolute inset-0 px-20 pt-10 text-pokemon text-black  max-w-[95%] leading-snug pointer-events-none flex flex-col justify-center">
           <span className="mb-2">
             {mensajes[index].speaker ? (
-              <span className="font-bold">{mensajes[index].speaker}:</span>
+              <span className="font-bold text-4xl ">
+                {mensajes[index].speaker}:
+              </span>
             ) : (
               <span className="font-bold">Narrador:</span>
             )}
           </span>
-          <span
-            className="whitespace-pre-line break-words"
-            style={{ minHeight: "3.5em", display: "block" }}
-          >
+          <span className="whitespace-pre-line break-words text-4xl ">
             {typedText}
           </span>
         </div>

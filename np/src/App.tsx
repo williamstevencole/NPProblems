@@ -1,12 +1,14 @@
-import "./App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import BootSelector from "./components/BootSelector";
 import GraphBuilder from "./Coloracion/GraphBuilder";
 
-function App() {
+export default function App() {
   return (
-    <div className="h-screen w-screen flex items-center justify-center">
-      <GraphBuilder />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<BootSelector />} />
+        <Route path="/coloracion" element={<GraphBuilder />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
-
-export default App;
