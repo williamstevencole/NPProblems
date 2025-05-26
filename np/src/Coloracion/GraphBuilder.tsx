@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import mapaSinnoh from "../assets/mapa-sinnoh.png";
+import mapaSinnoh from "../assets/images/mapa-sinnoh.png";
 import { ciudades, getColorVisual, conexiones } from "./ciudades";
 import PokemonDialog from "./pokemonDialog";
 import {

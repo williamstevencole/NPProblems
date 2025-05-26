@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import messageBox from "../assets/message-box.png";
+import messageBox from "../assets/images/message-box.png";
 
 type Mensaje = {
   speaker: string;
@@ -53,7 +53,7 @@ export default function PokemonDialog({
         //saltar a despues del ultimo mensaje
         setIndex(mensajes.length - 1);
         setTypedText(mensajes[mensajes.length - 1].text);
-        setIsTyping(true);
+        setIsTyping(false);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
