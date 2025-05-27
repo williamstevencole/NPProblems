@@ -57,7 +57,7 @@ export default function PokemonDialog({
     }
   };
 
-  // Manejo de teclas
+  // Manejo de teclas (Enter y Shift)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isAccionTexto) return;
@@ -82,6 +82,7 @@ export default function PokemonDialog({
         onClick={avanzar}
       >
         {isAccionTexto ? (
+          // Prompt de acción: texto a la izquierda, menú a la derecha
           <div className="absolute inset-0 px-24 mr-28 pb-8 text-pokemon text-black max-w-[95%] leading-snug pointer-events-none flex items-center">
             <span className="flex-1 text-4xl text-left">
               {mensajes[index].text}
@@ -89,8 +90,8 @@ export default function PokemonDialog({
             <div className="pointer-events-auto ml-8">{children}</div>
           </div>
         ) : (
-          // Diálogo normal: mantiene layout original
-          <div className="absolute inset-0 px-20  text-pokemon text-black max-w-[95%] leading-snug pointer-events-none flex flex-col justify-center">
+          // Diálogo normal: mantiene layout original y paddings exactos
+          <div className="absolute inset-0 px-20 pt-4 text-pokemon text-black max-w-[95%] leading-snug pointer-events-none flex flex-col justify-center">
             <span className="mb-2 font-bold text-4xl">
               {mensajes[index].speaker
                 ? mensajes[index].speaker + ":"
