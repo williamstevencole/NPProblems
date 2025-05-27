@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import mapaSinnoh from "../assets/images/mapa-sinnoh.png";
+import mapaSinnoh from "../assets/images/mapa-sinnoh copy.png";
 import { ciudades, getColorVisual, conexiones } from "./ciudades";
 import PokemonDialog from "./pokemonDialog";
 import {
@@ -20,99 +20,84 @@ export default function GraphBuilder() {
   );
   const [modoSeleccionActiva, setModoSeleccionActiva] = useState(false);
 
-  // Calcular ancho de etiquetas en SVG para posicionamiento
+  // Mide ancho de labels para tooltip
   useEffect(() => {
-    const newWidths: Record<string, number> = {};
-    for (const key in textRefs.current) {
-      const el = textRefs.current[key];
-      if (el) newWidths[key] = el.getBBox().width;
+    const newW: Record<string, number> = {};
+    for (const k in textRefs.current) {
+      const el = textRefs.current[k];
+      if (el) newW[k] = el.getBBox().width;
     }
-    setLabelWidths(newWidths);
+    setLabelWidths(newW);
   }, [hoveredCiudad]);
 
-  // Manejo de clic en ciudades
+  // Click en ciudad
   const handleCiudadClick = (nombre: string) => {
     if (dialogoActivo || !modoSeleccionActiva) return;
-
-    // Primera selección
     if (seleccionadas.length === 0) {
       setSeleccionadas([nombre]);
       setDialogoActivo(dialogos.seleccionCiudad(nombre));
       setModoSeleccionActiva(false);
       return;
     }
-
-    // Validar conexiones
-    const conexionesConSeleccionadas = (conexiones[nombre] || []).filter((c) =>
+    const conex = (conexiones[nombre] || []).filter((c) =>
       seleccionadas.includes(c)
     );
-    if (conexionesConSeleccionadas.length === 0) {
+    if (conex.length === 0) {
       setDialogoActivo(
         getDialogoErrorConexion(nombre, seleccionadas, conexiones)
       );
       setModoSeleccionActiva(false);
       return;
     }
-
-    // Agregar ciudad al grafo
-    setSeleccionadas((prev) => [...prev, nombre]);
-    setGrafo((prev) => {
-      const actualizado = { ...prev };
-      conexionesConSeleccionadas.forEach((c) => {
-        actualizado[c] = [...(actualizado[c] || []), nombre];
-        actualizado[nombre] = [...(actualizado[nombre] || []), c];
+    setSeleccionadas((p) => [...p, nombre]);
+    setGrafo((p) => {
+      const out = { ...p };
+      conex.forEach((c) => {
+        out[c] = [...(out[c] || []), nombre];
+        out[nombre] = [...(out[nombre] || []), c];
       });
-      return actualizado;
+      return out;
     });
-
     setDialogoActivo(dialogos.seleccionCiudad(nombre));
     setModoSeleccionActiva(false);
   };
 
-  // Manejo de selección en BattleMenu
-  const handleMenuSelect = (option: string) => {
-    if (option === "Nueva Ubicacion") {
+  // Selección de menú
+  const handleMenuSelect = (opt: string) => {
+    if (opt === "Nueva Ubicacion") {
       setDialogoActivo(dialogos.preselecionCiudad);
       setModoSeleccionActiva(false);
     } else {
       setDialogoActivo([
-        {
-          speaker: "Giovanni",
-          text: `No puedes usar ${option} ahora mismo. Concéntrate en la misión.`,
-        },
+        { speaker: "Giovanni", text: `No puedes usar ${opt} ahora.` },
       ]);
       setModoSeleccionActiva(false);
     }
   };
 
-  // Función de cierre del diálogo
+  // Cierra diálogo y avanza estado
   const handleDialogClose = () => {
     if (!dialogoActivo) return;
-
-    const primerTexto = dialogoActivo[0].text;
-
-    // 1) Terminó diálogo de introducción?
+    const first = dialogoActivo[0].text;
+    // 1) Intro
     if (
       dialogoActivo.length === dialogos.inicio.length &&
-      primerTexto === dialogos.inicio[0].text
+      first === dialogos.inicio[0].text
     ) {
       setDialogoActivo([{ speaker: "", text: "¿Qué acción vas a hacer?" }]);
       setModoSeleccionActiva(false);
       return;
     }
-
-    // 2) Terminó diálogo de preselección?
+    // 2) Preselección
     if (
       dialogoActivo.length === dialogos.preselecionCiudad.length &&
-      primerTexto === dialogos.preselecionCiudad[0].text
+      first === dialogos.preselecionCiudad[0].text
     ) {
-      // Activar selección de ciudades
       setDialogoActivo(null);
       setModoSeleccionActiva(true);
       return;
     }
-
-    // 3) Terminó diálogo de selección o error de conexión?
+    // 3) Selección o error
     setDialogoActivo([{ speaker: "", text: "¿Qué acción vas a hacer?" }]);
     setModoSeleccionActiva(false);
   };
@@ -121,28 +106,32 @@ export default function GraphBuilder() {
     <div className="fixed inset-0 w-screen h-screen bg-black">
       <svg
         viewBox="0 0 1268 734"
-        preserveAspectRatio="xMidYMid slice"
-        className="w-full h-full"
+        preserveAspectRatio="none"
+        className="absolute inset-0 w-full h-full"
       >
+        {/* Imagen de fondo estirada al viewBox 1268×734 */}
         <image
           href={mapaSinnoh}
+          x="0"
+          y="0"
           width="1268"
           height="734"
-          className="w-full h-full"
+          preserveAspectRatio="none"
         />
 
-        {Object.entries(grafo).flatMap(([origen, destinos]) =>
-          destinos.map((destino) => {
-            const o = ciudades.find((c) => c.nombre === origen);
-            const d = ciudades.find((c) => c.nombre === destino);
-            if (!o || !d) return null;
-            const x1 = (parseFloat(o.left) / 100) * 1268;
-            const y1 = (parseFloat(o.top) / 100) * 734;
-            const x2 = (parseFloat(d.left) / 100) * 1268;
-            const y2 = (parseFloat(d.top) / 100) * 734;
+        {/* Líneas de conexión */}
+        {Object.entries(grafo).flatMap(([o, dests]) =>
+          dests.map((d) => {
+            const co = ciudades.find((c) => c.nombre === o);
+            const cd = ciudades.find((c) => c.nombre === d);
+            if (!co || !cd) return null;
+            const x1 = (parseFloat(co.left) / 100) * 1268;
+            const y1 = (parseFloat(co.top) / 100) * 734;
+            const x2 = (parseFloat(cd.left) / 100) * 1268;
+            const y2 = (parseFloat(cd.top) / 100) * 734;
             return (
               <line
-                key={`${origen}-${destino}`}
+                key={`${o}-${d}`}
                 x1={x1}
                 y1={y1}
                 x2={x2}
@@ -154,6 +143,7 @@ export default function GraphBuilder() {
           })
         )}
 
+        {/* Nodos */}
         {ciudades.map((ciudad) => {
           const cx = (parseFloat(ciudad.left) / 100) * 1268;
           const cy = (parseFloat(ciudad.top) / 100) * 734;
@@ -174,7 +164,7 @@ export default function GraphBuilder() {
                 cx={cx}
                 cy={cy}
                 r={6}
-                fill={seleccionadas.includes(ciudad.nombre) ? "#facc15" : bg}
+                fill={bg}
                 stroke="white"
                 strokeWidth={2}
               />
@@ -208,7 +198,7 @@ export default function GraphBuilder() {
         })}
       </svg>
 
-      {dialogoActivo !== null && (
+      {dialogoActivo && (
         <PokemonDialog mensajes={dialogoActivo} onClose={handleDialogClose}>
           {dialogoActivo[0].speaker === "" && (
             <div className="flex justify-end mt-6 pointer-events-auto">
