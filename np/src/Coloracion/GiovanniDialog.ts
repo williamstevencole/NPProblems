@@ -1,5 +1,5 @@
 export type Mensaje = {
-  speaker: "Giovanni";
+  speaker: "Giovanni" | "";
   text: string;
 };
 
@@ -191,6 +191,7 @@ const dialogoFracaso: Mensaje[] = [
 export const dialogos = {
   preludio: dialogoIntroduccionJustificada,
   inicio: dialogoInicio,
+  preselecionCiudad: dialogoPreselecionCiudad,
   seleccionCiudad: getDialogoSeleccionCiudad,
   preparacion: dialogoPrepararColoracion,
   menu: {
