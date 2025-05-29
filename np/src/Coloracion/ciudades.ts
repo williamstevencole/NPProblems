@@ -36,10 +36,6 @@ export const ciudades: Ciudad[] = [
   { nombre: "Mount Coronet", top: "58%", left: "39%", color: "blue" },
 ];
 
-export const getColorVisual = (ciudad: Ciudad): string => {
-  return ciudad.color === "blue" ? "#2563eb" : "#dc2626";
-};
-
 export const conexiones: { [ciudad: string]: string[] } = {
   "Pal Park": ["Twinleaf Town"],
   "Twinleaf Town": ["Sandgem Town", "Pal Park"],
@@ -72,6 +68,8 @@ export const conexiones: { [ciudad: string]: string[] } = {
     "Solaceon Town",
     "Oreburgh City",
     "Snowpoint City",
+    "Veilstone City",
+    "Mount Coronet",
   ],
   "Hearthome City": [
     "Celestic Town",
@@ -82,7 +80,12 @@ export const conexiones: { [ciudad: string]: string[] } = {
     "Snowpoint City",
   ],
   "Solaceon Town": ["Hearthome City", "Veilstone City", "Celestic Town"],
-  "Veilstone City": ["Solaceon Town", "Pastoria City", "Sunyshore City"],
+  "Veilstone City": [
+    "Solaceon Town",
+    "Pastoria City",
+    "Sunyshore City",
+    "Celestic Town",
+  ],
   "Pastoria City": ["Hearthome City", "Veilstone City", "Sunyshore City"],
   "Sunyshore City": ["Pastoria City", "Veilstone City", "Sinnoh League"],
   "Sinnoh League": ["Sunyshore City", "Resort Area"],

@@ -16,7 +16,7 @@ const options = [
     border: "border-green-900",
   },
   {
-    label: "Agentes",
+    label: "Información de Algoritmos",
     gradient: "from-[#e6b94d] to-[#6b5700]",
     border: "border-yellow-900",
   },

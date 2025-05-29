@@ -25,6 +25,7 @@ export default function GraphBuilder({
     dialogos.inicio
   );
   const [modoSeleccionActiva, setModoSeleccionActiva] = useState(false);
+  const [pendienteColoracion, setPendienteColoracion] = useState(false);
 
   // use effect para medir ancho de labels para tooltip
   useEffect(() => {
@@ -73,7 +74,12 @@ export default function GraphBuilder({
     if (opt === "Nueva Ubicacion") {
       setDialogoActivo(dialogos.preselecionCiudad);
       setModoSeleccionActiva(false);
+    } else if (opt === "Información de Algoritmos") {
+      setDialogoActivo(dialogos.informacionAlgoritmos);
+      setModoSeleccionActiva(false);
     } else if (opt === "Colorar") {
+      if (!dialogoActivo) return;
+
       if (Object.keys(grafo).length === 0) {
         setDialogoActivo([
           {
@@ -84,21 +90,41 @@ export default function GraphBuilder({
         setModoSeleccionActiva(false);
         return;
       }
-      const resultado = await fetch("http://localhost:5000/api/coloracion", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ grafo }),
-      });
-      const data = await resultado.json();
-      console.log(data);
+      // si hay grafo, que ejecute el dialogo de preparar coloracion
+      if (Object.keys(grafo).length > 0) {
+        setDialogoActivo(dialogos.preparacion);
+        setModoSeleccionActiva(false);
+        setPendienteColoracion(true);
+        return;
+      }
 
-      // Usar la asignación del algoritmo greedy (o brute force si prefieres)
-      const asignacion = data.greedy.asignacion;
-      setColoracion(asignacion);
+      //si termino el dialogo de preparacion, que ejecute la llamada a la api
+      // y despues de que termine, que ejecute el dialogo de coloracion
+      const handleColoracion = async () => {
+        const resultado = await fetch("http://localhost:5000/api/coloracion", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ grafo }),
+        });
 
-      // Mostrar diálogo de éxito
-      setDialogoActivo(dialogos.resultado.exito);
-      setModoSeleccionActiva(false);
+        if (resultado.status !== 200) {
+          setDialogoActivo(dialogos.resultado.fracaso);
+          setModoSeleccionActiva(false);
+          return;
+        }
+
+        const data = await resultado.json();
+        console.log(data);
+        // Usar la asignación del algoritmo greedy (o brute force si prefieres)
+        const asignacion = data.greedy.asignacion;
+        setColoracion(asignacion);
+
+        // Mostrar diálogo de éxito
+        setDialogoActivo(dialogos.resultado.exito);
+        setModoSeleccionActiva(false);
+      };
+
+      handleColoracion();
     } else {
       setDialogoActivo([
         { speaker: "Giovanni", text: `No puedes usar ${opt} ahora.` },
@@ -108,7 +134,7 @@ export default function GraphBuilder({
   };
 
   // Cierra diálogo y avanza estado
-  const handleDialogClose = () => {
+  const handleDialogClose = async () => {
     if (!dialogoActivo) return;
     const first = dialogoActivo[0].text;
     // 1) Intro
@@ -130,6 +156,36 @@ export default function GraphBuilder({
       return;
     }
     // 3) Selección o error
+    if (pendienteColoracion) {
+      setPendienteColoracion(false);
+
+      // Ejecutar el backend...
+      const resultado = await fetch("http://localhost:5000/api/coloracion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ grafo }),
+      });
+
+      // Esperar 2 segundos antes de mostrar el resultado
+      setDialogoActivo([{ speaker: "Giovanni", text: "Colocando agentes..." }]);
+      //que no se pueda skipear el dialogo
+      setModoSeleccionActiva(false);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      //Ya pasaron los 2 segundos
+      if (resultado.status !== 200) {
+        setDialogoActivo(dialogos.resultado.fracaso);
+        setModoSeleccionActiva(false);
+        return;
+      }
+      const data = await resultado.json();
+      const asignacion = data.greedy.asignacion;
+      setColoracion(asignacion);
+      setDialogoActivo(dialogos.resultado.exito);
+      setModoSeleccionActiva(false);
+      return;
+    }
+
     setDialogoActivo([{ speaker: "", text: "¿Qué acción vas a hacer?" }]);
     setModoSeleccionActiva(false);
   };

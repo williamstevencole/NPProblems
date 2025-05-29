@@ -98,28 +98,6 @@ const dialogoPrepararColoracion: Mensaje[] = [
   { speaker: "Giovanni", text: "Ejecutando operacion... preparate." },
 ];
 
-const dialogoVerGrafo: Mensaje[] = [
-  {
-    speaker: "Giovanni",
-    text: "Quieres ver el estado actual del mapa... Muy bien.",
-  },
-  {
-    speaker: "Giovanni",
-    text: "Observa bien las conexiones que has creado. Un movimiento mal calculado... y todo se derrumba.",
-  },
-];
-
-const dialogoSeleccionarOtraCiudad: Mensaje[] = [
-  {
-    speaker: "Giovanni",
-    text: "Vas a elegir otra ciudad? Aun estas a tiempo de mejorar tu red.",
-  },
-  {
-    speaker: "Giovanni",
-    text: "Recuerda: solo las ciudades conectadas afectan el plan. Piensa estrategicamente.",
-  },
-];
-
 const dialogoSeleccionarAlgoritmoGreedy: Mensaje[] = [
   {
     speaker: "Giovanni",
@@ -188,6 +166,53 @@ const dialogoFracaso: Mensaje[] = [
   },
 ];
 
+export const informacionAlgoritmos: Mensaje[] = [
+  {
+    speaker: "Giovanni",
+    text: "Recluta, nuestra misión en Sinnoh depende de cómo distribuyamos a nuestros agentes. Existen dos enfoques: fuerza bruta y greedy. Presta atención…",
+  },
+  {
+    speaker: "Giovanni",
+    text: "Con el método de fuerza bruta, probamos **todas** las combinaciones posibles de asignación.",
+  },
+  {
+    speaker: "Giovanni",
+    text: "No dejamos nada al azar; cada ciudad recibe cada agente hasta hallar la configuración perfecta.",
+  },
+  {
+    speaker: "Giovanni",
+    text: "Es infalible y garantiza la solución **óptima**, pero con un mapa tan grande puede consumir mucho tiempo… tiempo que nuestro enemigo podría aprovechar.",
+  },
+  {
+    speaker: "Giovanni",
+    text: "Imagina enviar un ejército completo a cada ciudad, uno tras otro, hasta asegurar que no hay conflicto. Preciso… pero lento.",
+  },
+  {
+    speaker: "Giovanni",
+    text: "En cambio, el algoritmo greedy actúa con **rapidez**. Asigna un agente a la ciudad más crítica primero, luego al siguiente, siempre eligiendo lo que parezca mejor en cada paso.",
+  },
+  {
+    speaker: "Giovanni",
+    text: "Esta estrategia voraz reduce drásticamente el tiempo de cómputo. Sin embargo, al tomar decisiones locales puede dejar **puntos débiles** en la red.",
+  },
+  {
+    speaker: "Giovanni",
+    text: "En síntesis: \n• **Fuerza bruta** = paciencia, exhaustividad, seguridad absoluta, pero lento.",
+  },
+  {
+    speaker: "Giovanni",
+    text: "\n• **Greedy** = rapidez, eficiencia, riesgo calculado, pero no 100% infalible.",
+  },
+  {
+    speaker: "Giovanni",
+    text: "Tú decides: ¿arriesgarás velocidad para cubrir más terreno rápidamente, o asegurarás cada paso aunque te cueste más tiempo?",
+  },
+  {
+    speaker: "Giovanni",
+    text: "El destino del Team Rocket en Sinnoh está en tus manos. No me falles.",
+  },
+];
+
 export const dialogos = {
   preludio: dialogoIntroduccionJustificada,
   inicio: dialogoInicio,
@@ -195,8 +220,6 @@ export const dialogos = {
   seleccionCiudad: getDialogoSeleccionCiudad,
   preparacion: dialogoPrepararColoracion,
   menu: {
-    verGrafo: dialogoVerGrafo,
-    seleccionarOtra: dialogoSeleccionarOtraCiudad,
     algoritmoGreedy: dialogoSeleccionarAlgoritmoGreedy,
     algoritmoBruteForce: dialogoSeleccionarAlgoritmoBruteForce,
     terminarMision: dialogoTerminarMision,
@@ -205,6 +228,7 @@ export const dialogos = {
     exito: dialogoExito,
     fracaso: dialogoFracaso,
   },
+  informacionAlgoritmos: informacionAlgoritmos,
 };
 
 export const getDialogoErrorConexion = (
