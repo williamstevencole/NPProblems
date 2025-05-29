@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import mapaSinnoh from "../assets/images/mapa-sinnoh copy.png";
-import { ciudades, getColorVisual, conexiones } from "./ciudades";
+import { ciudades, conexiones } from "./ciudades";
 import PokemonDialog from "./pokemonDialog";
 import {
   dialogos,
@@ -8,11 +8,17 @@ import {
   getDialogoErrorConexion,
 } from "./GiovanniDialog";
 import BattleMenu from "./BattleMenu";
+import { sprites } from "./sprites";
 
-export default function GraphBuilder() {
+export default function GraphBuilder({
+  colorBase = "blue",
+}: {
+  colorBase?: "blue" | "red";
+}) {
   const [grafo, setGrafo] = useState<{ [key: string]: string[] }>({});
   const [seleccionadas, setSeleccionadas] = useState<string[]>([]);
   const [hoveredCiudad, setHoveredCiudad] = useState<string | null>(null);
+  const [coloracion, setColoracion] = useState<{ [key: string]: number }>({});
   const textRefs = useRef<Record<string, SVGTextElement | null>>({});
   const [labelWidths, setLabelWidths] = useState<Record<string, number>>({});
   const [dialogoActivo, setDialogoActivo] = useState<Mensaje[] | null>(
@@ -20,7 +26,7 @@ export default function GraphBuilder() {
   );
   const [modoSeleccionActiva, setModoSeleccionActiva] = useState(false);
 
-  // Mide ancho de labels para tooltip
+  // use effect para medir ancho de labels para tooltip
   useEffect(() => {
     const newW: Record<string, number> = {};
     for (const k in textRefs.current) {
@@ -63,9 +69,35 @@ export default function GraphBuilder() {
   };
 
   // Selección de menú
-  const handleMenuSelect = (opt: string) => {
+  const handleMenuSelect = async (opt: string) => {
     if (opt === "Nueva Ubicacion") {
       setDialogoActivo(dialogos.preselecionCiudad);
+      setModoSeleccionActiva(false);
+    } else if (opt === "Colorar") {
+      if (Object.keys(grafo).length === 0) {
+        setDialogoActivo([
+          {
+            speaker: "Giovanni",
+            text: "No has seleccionado ninguna ciudad. Selecciona al menos una ciudad antes de colorear.",
+          },
+        ]);
+        setModoSeleccionActiva(false);
+        return;
+      }
+      const resultado = await fetch("http://localhost:5000/api/coloracion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ grafo }),
+      });
+      const data = await resultado.json();
+      console.log(data);
+
+      // Usar la asignación del algoritmo greedy (o brute force si prefieres)
+      const asignacion = data.greedy.asignacion;
+      setColoracion(asignacion);
+
+      // Mostrar diálogo de éxito
+      setDialogoActivo(dialogos.resultado.exito);
       setModoSeleccionActiva(false);
     } else {
       setDialogoActivo([
@@ -147,8 +179,17 @@ export default function GraphBuilder() {
         {ciudades.map((ciudad) => {
           const cx = (parseFloat(ciudad.left) / 100) * 1268;
           const cy = (parseFloat(ciudad.top) / 100) * 734;
-          const bg = getColorVisual(ciudad);
+
+          let bg = "#facc15";
+          if (!seleccionadas.includes(ciudad.nombre)) {
+            bg = colorBase === "red" ? "#dc2626" : "#2563eb";
+          }
           const tw = labelWidths[ciudad.nombre] || 0;
+
+          // Mostrar sprite si la ciudad tiene color asignado
+          const colorIndex = coloracion[ciudad.nombre];
+          const spriteUrl = colorIndex ? sprites[colorIndex - 1] : null;
+
           return (
             <g
               key={ciudad.nombre}
@@ -168,6 +209,16 @@ export default function GraphBuilder() {
                 stroke="white"
                 strokeWidth={2}
               />
+              {spriteUrl && (
+                <image
+                  href={spriteUrl}
+                  x={cx - 20}
+                  y={cy - 20}
+                  width={40}
+                  height={40}
+                  style={{ pointerEvents: "none" }}
+                />
+              )}
               {hoveredCiudad === ciudad.nombre && (
                 <>
                   <rect

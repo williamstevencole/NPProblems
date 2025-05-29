@@ -11,14 +11,14 @@ const options = [
     border: "border-pink-800",
   },
   {
+    label: "Colorar",
+    gradient: "from-[#86c686] to-[#183218]",
+    border: "border-green-900",
+  },
+  {
     label: "Agentes",
     gradient: "from-[#e6b94d] to-[#6b5700]",
     border: "border-yellow-900",
-  },
-  {
-    label: "Algoritmos",
-    gradient: "from-[#86c686] to-[#183218]",
-    border: "border-green-900",
   },
   {
     label: "Salir",
