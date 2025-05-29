@@ -168,7 +168,6 @@ export default function GraphBuilder({
 
       // Esperar 2 segundos antes de mostrar el resultado
       setDialogoActivo([{ speaker: "Giovanni", text: "Colocando agentes..." }]);
-      //que no se pueda skipear el dialogo
       setModoSeleccionActiva(false);
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
