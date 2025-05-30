@@ -3,9 +3,10 @@ import random
 
 n = 988  # Número de nodos
 grafo = {}
-conexiones_por_nodo = 1  # Número de conexiones por nodo
-nodos = [f"N{i}" for i in range(1, n + 1)]
+conexiones_por_nodo = 988  # Número de conexiones por nodo
+nodos = [f"N{i}" for i in range(1, n + 1)] # Generar nodos
 
+# Generar un grafo aleatorio con conexiones únicas
 for nodo in nodos:
     conexiones = set()
     while len(conexiones) < conexiones_por_nodo:
