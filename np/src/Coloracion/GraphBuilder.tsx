@@ -101,11 +101,14 @@ export default function GraphBuilder({
       //si termino el dialogo de preparacion, que ejecute la llamada a la api
       // y despues de que termine, que ejecute el dialogo de coloracion
       const handleColoracion = async () => {
-        const resultado = await fetch("http://localhost:5000/api/coloracion", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ grafo }),
-        });
+        const resultado = await fetch(
+          "https://coleexz.pythonanywhere.com/api/coloracion",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ grafo }),
+          }
+        );
 
         if (resultado.status !== 200) {
           setDialogoActivo(dialogos.resultado.fracaso);
