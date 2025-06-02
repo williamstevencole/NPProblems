@@ -3,6 +3,7 @@ import logo from "../assets/images/logo.png";
 import grafo from "../assets/images/grafo.png";
 import github from "../assets/images/github.png";
 import docs from "../assets/images/docs.png";
+import mochila from "../assets/images/mochila.png"
 
 type Disk = {
   to: string;
@@ -26,15 +27,16 @@ const disks: Disk[] = [
     label: "Informe",
     image: docs,
   },
+   {
+    to: "/knapsack",
+    label: "Knapsack",
+    image: mochila,
+  },
   /*
 
   AGREGAR LOS NUEVOS PROBLEMAS NP AQUI
 
-  {
-    to: "/coloracion",
-    label: "Coloración de Grafos",
-    image: grafo,
-  },
+ 
   {
     to: "/coloracion",
     label: "Coloración de Grafos",
