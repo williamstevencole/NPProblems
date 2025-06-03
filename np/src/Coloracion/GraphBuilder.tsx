@@ -9,6 +9,13 @@ import {
 } from "./GiovanniDialog";
 import BattleMenu from "./BattleMenu";
 import { sprites } from "./sprites";
+import ConvertJSONToMatrix from "../utils/ConvertJSONToMatrix";
+
+// URLs de endpoints
+const URL_BACKTRACKING =
+  "https://coleexz.pythonanywhere.com/api/coloracion-backtracking";
+const URL_BACKTRACKING_GFG =
+  "https://coleexz.pythonanywhere.com/api/coloracion-backtracking-gfg";
 
 export default function GraphBuilder({
   colorBase = "blue",
@@ -27,7 +34,13 @@ export default function GraphBuilder({
   const [modoSeleccionActiva, setModoSeleccionActiva] = useState(false);
   const [pendienteColoracion, setPendienteColoracion] = useState(false);
 
-  // use effect para medir ancho de labels para tooltip
+  const [coloracionBacktracking, setColoracionBacktracking] = useState<{
+    [key: string]: number;
+  }>({});
+  const [coloracionBacktrackingGFG, setColoracionBacktrackingGFG] = useState<{
+    [key: string]: number;
+  }>({});
+
   useEffect(() => {
     const newW: Record<string, number> = {};
     for (const k in textRefs.current) {
@@ -37,7 +50,6 @@ export default function GraphBuilder({
     setLabelWidths(newW);
   }, [hoveredCiudad]);
 
-  // Click en ciudad
   const handleCiudadClick = (nombre: string) => {
     if (dialogoActivo || !modoSeleccionActiva) return;
     if (seleccionadas.length === 0) {
@@ -69,9 +81,12 @@ export default function GraphBuilder({
     setModoSeleccionActiva(false);
   };
 
-  // Selección de menú
   const handleMenuSelect = async (opt: string) => {
     if (opt === "Nueva Ubicacion") {
+      setColoracionBacktracking({});
+      setColoracionBacktrackingGFG({});
+      setColoracion({});
+
       setDialogoActivo(dialogos.preselecionCiudad);
       setModoSeleccionActiva(false);
     } else if (opt === "Información de Algoritmos") {
@@ -79,7 +94,6 @@ export default function GraphBuilder({
       setModoSeleccionActiva(false);
     } else if (opt === "Colorar") {
       if (!dialogoActivo) return;
-
       if (Object.keys(grafo).length === 0) {
         setDialogoActivo([
           {
@@ -90,44 +104,9 @@ export default function GraphBuilder({
         setModoSeleccionActiva(false);
         return;
       }
-      // si hay grafo, que ejecute el dialogo de preparar coloracion
-      if (Object.keys(grafo).length > 0) {
-        setDialogoActivo(dialogos.preparacion);
-        setModoSeleccionActiva(false);
-        setPendienteColoracion(true);
-        return;
-      }
-
-      //si termino el dialogo de preparacion, que ejecute la llamada a la api
-      // y despues de que termine, que ejecute el dialogo de coloracion
-      const handleColoracion = async () => {
-        const resultado = await fetch(
-          "https://coleexz.pythonanywhere.com/api/coloracion",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ grafo }),
-          }
-        );
-
-        if (resultado.status !== 200) {
-          setDialogoActivo(dialogos.resultado.fracaso);
-          setModoSeleccionActiva(false);
-          return;
-        }
-
-        const data = await resultado.json();
-        console.log(data);
-        // Usar la asignación del algoritmo greedy (o brute force si prefieres)
-        const asignacion = data.greedy.asignacion;
-        setColoracion(asignacion);
-
-        // Mostrar diálogo de éxito
-        setDialogoActivo(dialogos.resultado.exito);
-        setModoSeleccionActiva(false);
-      };
-
-      handleColoracion();
+      setDialogoActivo(dialogos.preparacion);
+      setModoSeleccionActiva(false);
+      setPendienteColoracion(true);
     } else {
       setDialogoActivo([
         { speaker: "Giovanni", text: `No puedes usar ${opt} ahora.` },
@@ -136,11 +115,11 @@ export default function GraphBuilder({
     }
   };
 
-  // Cierra diálogo y avanza estado
   const handleDialogClose = async () => {
     if (!dialogoActivo) return;
+
     const first = dialogoActivo[0].text;
-    // 1) Intro
+
     if (
       dialogoActivo.length === dialogos.inicio.length &&
       first === dialogos.inicio[0].text
@@ -149,7 +128,7 @@ export default function GraphBuilder({
       setModoSeleccionActiva(false);
       return;
     }
-    // 2) Preselección
+
     if (
       dialogoActivo.length === dialogos.preselecionCiudad.length &&
       first === dialogos.preselecionCiudad[0].text
@@ -158,31 +137,45 @@ export default function GraphBuilder({
       setModoSeleccionActiva(true);
       return;
     }
-    // 3) Selección o error
+
     if (pendienteColoracion) {
       setPendienteColoracion(false);
 
-      // Ejecutar el backend...
-      const resultado = await fetch("http://localhost:5000/api/coloracion", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ grafo }),
-      });
+      const body = JSON.stringify({ grafo });
 
-      // Esperar 2 segundos antes de mostrar el resultado
+      const [resBacktracking, resGFG] = await Promise.all([
+        fetch(URL_BACKTRACKING, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body,
+        }),
+        fetch(URL_BACKTRACKING_GFG, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(ConvertJSONToMatrix(grafo)),
+        }),
+      ]);
+
       setDialogoActivo([{ speaker: "Giovanni", text: "Colocando agentes..." }]);
       setModoSeleccionActiva(false);
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      //Ya pasaron los 2 segundos
-      if (resultado.status !== 200) {
+      if (resBacktracking.status !== 200 || resGFG.status !== 200) {
         setDialogoActivo(dialogos.resultado.fracaso);
         setModoSeleccionActiva(false);
         return;
       }
-      const data = await resultado.json();
-      const asignacion = data.greedy.asignacion;
-      setColoracion(asignacion);
+
+      const dataBacktracking = await resBacktracking.json();
+
+      const asignacionBack = dataBacktracking.backtracking?.asignacion ?? {};
+      const asignacionGFG =
+        (await resGFG.json()).backtracking?.asignacion ?? {};
+
+      setColoracionBacktracking(asignacionBack);
+      setColoracionBacktrackingGFG(asignacionGFG);
+      setColoracion(asignacionBack);
+
       setDialogoActivo(dialogos.resultado.exito);
       setModoSeleccionActiva(false);
       return;
@@ -199,7 +192,6 @@ export default function GraphBuilder({
         preserveAspectRatio="none"
         className="absolute inset-0 w-full h-full"
       >
-        {/* Imagen de fondo estirada al viewBox 1268×734 */}
         <image
           href={mapaSinnoh}
           x="0"
@@ -209,7 +201,6 @@ export default function GraphBuilder({
           preserveAspectRatio="none"
         />
 
-        {/* Líneas de conexión */}
         {Object.entries(grafo).flatMap(([o, dests]) =>
           dests.map((d) => {
             const co = ciudades.find((c) => c.nombre === o);
@@ -233,7 +224,6 @@ export default function GraphBuilder({
           })
         )}
 
-        {/* Nodos */}
         {ciudades.map((ciudad) => {
           const cx = (parseFloat(ciudad.left) / 100) * 1268;
           const cy = (parseFloat(ciudad.top) / 100) * 734;
@@ -243,8 +233,6 @@ export default function GraphBuilder({
             bg = colorBase === "red" ? "#dc2626" : "#2563eb";
           }
           const tw = labelWidths[ciudad.nombre] || 0;
-
-          // Mostrar sprite si la ciudad tiene color asignado
           const colorIndex = coloracion[ciudad.nombre];
           const spriteUrl = colorIndex ? sprites[colorIndex - 1] : null;
 

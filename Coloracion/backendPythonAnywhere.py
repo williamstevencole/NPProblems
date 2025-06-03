@@ -5,82 +5,50 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# Endpoint 1: Backtracking tipo GFG con matriz de adyacencia
 @app.route('/api/coloracion-backtracking-gfg', methods=['POST'])
-def coloracion_backtracking_gfg_endpoint():
+def coloracion_backtracking_gfg():
     data = request.get_json()
-    grafo_dict = data.get('grafo')
+    graph = data.get("matriz")
 
-    if not grafo_dict:
-        return jsonify({"error": "No se proporcionó un grafo"}), 400
+    if not graph:
+        return jsonify({"error": "Falta la matriz de adyacencia"}), 400
 
-    nodos = list(grafo_dict.keys())
-    index_map = {nodo: idx for idx, nodo in enumerate(nodos)}
-    reverse_map = {idx: nodo for nodo, idx in index_map.items()}
-    V = len(nodos)
+    V = len(graph)
 
-    graph = [[0] * V for _ in range(V)]
-    for nodo, vecinos in grafo_dict.items():
-        for vecino in vecinos:
-            if vecino in index_map:
-                i = index_map[nodo]
-                j = index_map[vecino]
-                graph[i][j] = 1
-                graph[j][i] = 1  # No dirigido
-
-    color = [0] * V
-    m = V
-    llamadas = 0
-    backtracks = 0
-
-    def is_safe(v, c):
+    def is_safe(v, graph, color, c):
         for i in range(V):
             if graph[v][i] and color[i] == c:
                 return False
         return True
 
-    def util(v):
-        nonlocal llamadas, backtracks
-        llamadas += 1
+    def graph_coloring_util(graph, m, color, v):
         if v == V:
             return True
+
         for c in range(1, m + 1):
-            if is_safe(v, c):
+            if is_safe(v, graph, color, c):
                 color[v] = c
-                if util(v + 1):
+                if graph_coloring_util(graph, m, color, v + 1):
                     return True
                 color[v] = 0
-                backtracks += 1
         return False
 
-    inicio = time.perf_counter()
-    exito = util(0)
-    fin = time.perf_counter()
+    def graph_coloring(graph, m):
+        color = [0] * V
+        if not graph_coloring_util(graph, m, color, 0):
+            return None
+        return color
 
-    if not exito:
-        return jsonify({
-            "gfg_backtracking": {
-                "asignacion": None,
-                "colores_usados": 0,
-                "tiempo": (fin - inicio) * 1000,
-                "llamadas": llamadas,
-                "backtracks": backtracks
-            }
-        })
+    m = V  # Asigna como máximo V colores
+    resultado = graph_coloring(graph, m)
 
-    asignacion = {
-        reverse_map[i]: color[i] for i in range(V)
-    }
+    if resultado is None:
+        return jsonify({"resultado": None})
 
-    return jsonify({
-        "gfg_backtracking": {
-            "asignacion": asignacion,
-            "colores_usados": max(color),
-            "tiempo": (fin - inicio) * 1000,
-            "llamadas": llamadas,
-            "backtracks": backtracks
-        }
-    })
+    return jsonify({"resultado": resultado})
+
+
+
 
 
 # Endpoint 2: Backtracking tipo diccionario sin matriz de adyacencia
@@ -100,43 +68,38 @@ def coloracion_backtracking_endpoint():
     def es_valido(asignacion, nodo, color):
         return all(asignacion.get(vecino) != color for vecino in grafo[nodo])
 
-    # Versión iterativa del backtracking
-    def backtrack_iterativo():
+    def backtrack(index, asignacion):
         nonlocal llamadas, backtracks
-        asignacion = {}
-        stack = [(0, asignacion.copy())]  # (índice, asignación actual)
-        
-        while stack:
-            llamadas += 1
-            index, current_asignacion = stack.pop()
-            
-            if index == len(nodos):
-                return current_asignacion
-                
-            nodo = nodos[index]
-            for color in range(1, max_colores + 1):
-                if es_valido(current_asignacion, nodo, color):
-                    new_asignacion = current_asignacion.copy()
-                    new_asignacion[nodo] = color
-                    stack.append((index + 1, new_asignacion))
-                else:
-                    backtracks += 1
-                    
-        return None
+        llamadas += 1
+        if index == len(nodos):
+            return True
+        nodo = nodos[index]
+        for color in range(1, max_colores + 1):
+            if es_valido(asignacion, nodo, color):
+                asignacion[nodo] = color
+                if backtrack(index + 1, asignacion):
+                    return True
+                del asignacion[nodo]
+                backtracks += 1
+        return False
 
+    asignacion = {}
     inicio = time.perf_counter()
-    asignacion = backtrack_iterativo()
+    exito = backtrack(0, asignacion)
     fin = time.perf_counter()
 
     return jsonify({
         "backtracking": {
-            "asignacion": asignacion,
-            "colores_usados": max(asignacion.values()) if asignacion else 0,
+            "asignacion": asignacion if exito else None,
+            "colores_usados": max(asignacion.values()) if exito else 0,
             "tiempo": (fin - inicio) * 1000,
             "llamadas": llamadas,
             "backtracks": backtracks
         }
     })
+
+
+
 
 
 if __name__ == '__main__':

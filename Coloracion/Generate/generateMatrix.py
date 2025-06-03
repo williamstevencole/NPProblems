@@ -9,14 +9,19 @@ def generar_matriz_adyacencia(n, conexiones_por_nodo):
         vecinos = random.sample(posibles_vecinos, min(conexiones_por_nodo, len(posibles_vecinos)))
         for j in vecinos:
             matriz[i][j] = 1
-            matriz[j][i] = 1  # no dirigido
+            matriz[j][i] = 1  # grafo no dirigido
 
     return matriz
 
-n = 988
-conexiones_por_nodo = 988
+n = 20
+conexiones_por_nodo = 1
 
 matriz = generar_matriz_adyacencia(n, conexiones_por_nodo)
 
+# Envolvemos la matriz en un diccionario con la clave "matriz"
+output = {
+    "matriz": matriz
+}
+
 with open(f"matriz_adyacencia_{n}_{conexiones_por_nodo}.json", "w") as f:
-    json.dump(matriz, f, indent=2)
+    json.dump(output, f, indent=2)
