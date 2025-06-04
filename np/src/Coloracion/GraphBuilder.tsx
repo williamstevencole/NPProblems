@@ -11,11 +11,12 @@ import BattleMenu from "./BattleMenu";
 import { sprites } from "./sprites";
 import ConvertJSONToMatrix from "../utils/ConvertJSONToMatrix";
 
-// URLs de endpoints
-const URL_BACKTRACKING =
-  "https://coleexz.pythonanywhere.com/api/coloracion-backtracking";
+//const URL_BACKTRACKING ="https://coleexz.pythonanywhere.com/api/coloracion-backtracking";
+//const URL_BACKTRACKING_GFG ="https://coleexz.pythonanywhere.com/api/coloracion-backtracking-gfg";
+
+const URL_BACKTRACKING = "http://127.0.0.1:5000/api/coloracion-backtracking";
 const URL_BACKTRACKING_GFG =
-  "https://coleexz.pythonanywhere.com/api/coloracion-backtracking-gfg";
+  "http://127.0.0.1:5000/api/coloracion-backtracking-gfg";
 
 export default function GraphBuilder({
   colorBase = "blue",
@@ -174,6 +175,11 @@ export default function GraphBuilder({
 
       setColoracionBacktracking(asignacionBack);
       setColoracionBacktrackingGFG(asignacionGFG);
+
+      //Por mientras no lo estoy utilizando
+      console.log(coloracionBacktracking);
+      console.log(coloracionBacktrackingGFG);
+
       setColoracion(asignacionBack);
 
       setDialogoActivo(dialogos.resultado.exito);
