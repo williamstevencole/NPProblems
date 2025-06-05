@@ -5,6 +5,9 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+from flask import request, jsonify
+import time
+
 @app.route('/api/coloracion-backtracking-gfg', methods=['POST'])
 def coloracion_backtracking_gfg():
     data = request.get_json()
@@ -14,6 +17,9 @@ def coloracion_backtracking_gfg():
         return jsonify({"error": "Falta la matriz de adyacencia"}), 400
 
     V = len(graph)
+    color = [0] * V
+    llamadas = 0
+    backtracks = 0
 
     def is_safe(v, graph, color, c):
         for i in range(V):
@@ -22,6 +28,8 @@ def coloracion_backtracking_gfg():
         return True
 
     def graph_coloring_util(graph, m, color, v):
+        nonlocal llamadas, backtracks
+        llamadas += 1
         if v == V:
             return True
 
@@ -31,22 +39,25 @@ def coloracion_backtracking_gfg():
                 if graph_coloring_util(graph, m, color, v + 1):
                     return True
                 color[v] = 0
+                backtracks += 1
         return False
 
-    def graph_coloring(graph, m):
-        color = [0] * V
-        if not graph_coloring_util(graph, m, color, 0):
-            return None
-        return color
+    m = V  # Hasta V colores
+    inicio = time.time()
+    exito = graph_coloring_util(graph, m, color, 0)
+    fin = time.time()
 
-    m = V  # Asigna como máximo V colores
-    resultado = graph_coloring(graph, m)
+    asignacion = {i: color[i] for i in range(V)} if exito else {}
 
-    if resultado is None:
-        return jsonify({"resultado": None})
-
-    return jsonify({"resultado": resultado})
-
+    return jsonify({
+        "backtracking": {
+            "asignacion": asignacion if exito else None,
+            "colores_usados": max(asignacion.values()) if exito else 0,
+            "tiempo": (fin - inicio) * 1000,
+            "llamadas": llamadas,
+            "backtracks": backtracks
+        }
+    })
 
 
 
