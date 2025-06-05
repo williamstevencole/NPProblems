@@ -24,14 +24,19 @@ const InfoOverlay = ({
 }: InfoProps) => {
   const [, setLabelWidths] = useState<Record<string, number>>({});
   const [opacity, setOpacity] = useState(0);
+  const [translateY, setTranslateY] = useState(100); // Start offscreen (100%)
   const textRefs = useRef<Record<string, SVGTextElement | null>>({});
 
-  // Fade in effect when component mounts
+  // Fade in and slide up effect when component mounts
   useEffect(() => {
-    // Start with 0 opacity
+    // Start with 0 opacity and translated down
     setOpacity(0);
-    // After a small delay, animate to full opacity
-    const timer = setTimeout(() => setOpacity(1), 50);
+    setTranslateY(100);
+    // After a small delay, animate to full opacity and position
+    const timer = setTimeout(() => {
+      setOpacity(1);
+      setTranslateY(0);
+    }, 50);
     return () => clearTimeout(timer);
   }, []);
 
@@ -66,6 +71,7 @@ const InfoOverlay = ({
   const handleClose = (e: Event) => {
     e.preventDefault();
     setOpacity(0);
+    setTranslateY(-100); // Move up and out
     setTimeout(onClose, 1200);
   };
 
@@ -74,7 +80,8 @@ const InfoOverlay = ({
       className="fixed inset-0 w-full h-full bg-black flex justify-center items-center z-50"
       style={{
         opacity,
-        transition: "opacity 300ms ease-in-out",
+        transform: `translateY(${translateY}%)`,
+        transition: "opacity 300ms ease-in-out, transform 600ms ease-in-out",
       }}
     >
       <svg
