@@ -194,7 +194,7 @@ export default function GraphBuilder({
       const llamadasBack = jsonBack.backtracking?.llamadas ?? 0;
       const backtsBack = jsonBack.backtracking?.backtracks ?? 0;
 
-      // Extraer datos de GFG
+      // Estados donde guardamos los datos devueltos
       const asignG = jsonGFG.backtracking?.asignacion ?? {};
       const coloresG = jsonGFG.backtracking?.colores_usados ?? 0;
       const tiempoG = jsonGFG.backtracking?.tiempo ?? 0;
