@@ -1,4 +1,3 @@
-// src/components/InfoOverlay.tsx
 import info from "../assets/images/info.png";
 import { useEffect, useRef, useState } from "react";
 
@@ -10,7 +9,7 @@ interface InfoProps {
   tiempo: number; // en milisegundos
   autor: string;
   description: string;
-  onClose: () => void; // callback para cerrar
+  onClose: () => void;
 }
 
 const InfoOverlay = ({
@@ -24,7 +23,17 @@ const InfoOverlay = ({
   onClose,
 }: InfoProps) => {
   const [, setLabelWidths] = useState<Record<string, number>>({});
+  const [opacity, setOpacity] = useState(0);
   const textRefs = useRef<Record<string, SVGTextElement | null>>({});
+
+  // Fade in effect when component mounts
+  useEffect(() => {
+    // Start with 0 opacity
+    setOpacity(0);
+    // After a small delay, animate to full opacity
+    const timer = setTimeout(() => setOpacity(1), 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const newW: Record<string, number> = {};
@@ -39,10 +48,10 @@ const InfoOverlay = ({
   useEffect(() => {
     const handler = (e: KeyboardEvent | MouseEvent) => {
       if (e instanceof KeyboardEvent && (e.key === " " || e.key === "Shift")) {
-        onClose();
+        handleClose(e);
       }
       if (e instanceof MouseEvent) {
-        onClose();
+        handleClose(e);
       }
     };
     window.addEventListener("keydown", handler);
@@ -53,8 +62,21 @@ const InfoOverlay = ({
     };
   }, [onClose]);
 
+  // Close handler with fade out effect
+  const handleClose = (e: Event) => {
+    e.preventDefault();
+    setOpacity(0);
+    setTimeout(onClose, 1200);
+  };
+
   return (
-    <div className="fixed inset-0 w-full h-full bg-black flex justify-center items-center z-50">
+    <div
+      className="fixed inset-0 w-full h-full bg-black flex justify-center items-center z-50"
+      style={{
+        opacity,
+        transition: "opacity 300ms ease-in-out",
+      }}
+    >
       <svg
         viewBox="0 0 1536 1024"
         preserveAspectRatio="none"
@@ -64,14 +86,7 @@ const InfoOverlay = ({
         <image href={info} x="0" y="0" width="1536" height="1024" />
 
         {/* Imagen semitransparente encima */}
-        <image
-          href={image}
-          x="0"
-          y="0"
-          width="1536"
-          height="1024"
-          className="opacity-50"
-        />
+        <image href={image} x="120" y="180" width="500" height="500" />
 
         {/* Backtracks */}
         <text
@@ -83,33 +98,15 @@ const InfoOverlay = ({
         >
           Backtracks
         </text>
-        <text
-          x={1070}
-          y={220}
-          fontSize={26}
-          fill="black"
-          fontFamily="pokemon-dp-pro"
-        >
+        <text x={1070} y={220} fontSize={26} fontFamily="pokemon-dp-pro">
           {backtracks}
         </text>
 
         {/* Llamadas */}
-        <text
-          x={800}
-          y={330}
-          fontSize={26}
-          fill="black"
-          fontFamily="pokemon-dp-pro"
-        >
+        <text x={800} y={330} fontSize={26} fontFamily="pokemon-dp-pro">
           Llamadas
         </text>
-        <text
-          x={1070}
-          y={330}
-          fontSize={26}
-          fill="black"
-          fontFamily="pokemon-dp-pro"
-        >
+        <text x={1070} y={330} fontSize={26} fontFamily="pokemon-dp-pro">
           {llamadas}
         </text>
 
@@ -154,22 +151,10 @@ const InfoOverlay = ({
         </text>
 
         {/* Autor */}
-        <text
-          x={800}
-          y={660}
-          fontSize={26}
-          fill="black"
-          fontFamily="pokemon-dp-pro"
-        >
+        <text x={800} y={660} fontSize={26} fontFamily="pokemon-dp-pro">
           Autor
         </text>
-        <text
-          x={1070}
-          y={660}
-          fontSize={26}
-          fill="black"
-          fontFamily="pokemon-dp-pro"
-        >
+        <text x={1070} y={660} fontSize={26} fontFamily="pokemon-dp-pro">
           {autor}
         </text>
 

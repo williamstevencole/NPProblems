@@ -1,4 +1,3 @@
-// src/components/GraphBuilder.tsx
 import { useState, useRef, useEffect } from "react";
 import mapaSinnoh from "../assets/images/mapa-sinnoh copy.png";
 import { ciudades, conexiones } from "./ciudades";
@@ -12,6 +11,8 @@ import BattleMenu from "./BattleMenu";
 import { sprites } from "./sprites";
 import ConvertJSONToMatrix from "../utils/ConvertJSONToMatrix";
 import InfoOverlay from "./info";
+import cole from "../assets/images/cole.png";
+import geekfromgeeks from "../assets/images/geekforgeeks.png";
 
 const URL_BACKTRACKING = "http://127.0.0.1:5000/api/coloracion-backtracking";
 const URL_BACKTRACKING_GFG =
@@ -22,6 +23,12 @@ export default function GraphBuilder({
 }: {
   colorBase?: "blue" | "red";
 }) {
+  const Navigate = useRef({
+    to: (path: string) => {
+      window.location.href = path;
+    },
+  }).current;
+
   const [grafo, setGrafo] = useState<{ [key: string]: string[] }>({});
   const [seleccionadas, setSeleccionadas] = useState<string[]>([]);
   const [hoveredCiudad, setHoveredCiudad] = useState<string | null>(null);
@@ -96,6 +103,18 @@ export default function GraphBuilder({
 
   // Manejador de opciones del BattleMenu
   const handleMenuSelect = async (opt: string) => {
+    if (opt === "Salir") {
+      setDialogoActivo([
+        {
+          speaker: "Giovanni",
+          text: "¡Hasta la próxima!",
+        },
+      ]);
+      setModoSeleccionActiva(false);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      Navigate.to("/");
+      return;
+    }
     if (opt === "Nueva Ubicacion") {
       // Reiniciar selección y resultados
       setColoracion({});
@@ -130,7 +149,7 @@ export default function GraphBuilder({
   };
 
   // Manejador de cierre de diálogo, avanza estados según contexto
-  const handleDialogClose = async () => {
+  let handleDialogClose = async () => {
     if (!dialogoActivo) return;
     const first = dialogoActivo[0].text;
 
@@ -398,16 +417,15 @@ export default function GraphBuilder({
         </PokemonDialog>
       )}
 
-      {/* ------------------------------------------------------------ */}
       {/* InfoOverlay de Backtracking */}
       {mostrarInfoBack && dataBacktracking && (
         <InfoOverlay
-          image={sprites[0]}
+          image={cole}
           backtracks={dataBacktracking.backtracks}
           llamadas={dataBacktracking.llamadas}
           colores={dataBacktracking.colores_usados}
           tiempo={dataBacktracking.tiempo}
-          autor="Algoritmo Backtracking"
+          autor="William Cole"
           description="Este algoritmo realiza una búsqueda exhaustiva por retroceso, garantizando una solución óptima aunque sea costoso en tiempo."
           onClose={() => {
             setMostrarInfoBack(false);
@@ -422,11 +440,10 @@ export default function GraphBuilder({
         />
       )}
 
-      {/* ------------------------------------------------------------ */}
       {/* InfoOverlay de GFG */}
       {mostrarInfoGFG && dataGFG && (
         <InfoOverlay
-          image={sprites[1]}
+          image={geekfromgeeks}
           backtracks={dataGFG.backtracks}
           llamadas={dataGFG.llamadas}
           colores={dataGFG.colores_usados}
@@ -435,7 +452,6 @@ export default function GraphBuilder({
           description="Este algoritmo implementa una versión heurística de coloración. Es más rápido pero no asegura siempre la solución óptima."
           onClose={() => {
             setMostrarInfoGFG(false);
-            // Al cerrar, volvemos al menú de batalla
             setDialogoActivo([
               { speaker: "", text: "¿Qué acción vas a hacer?" },
             ]);
