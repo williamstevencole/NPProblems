@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import BootSelector from "./components/BootSelector";
-import GraphBuilder from "./Coloracion/GraphBuilder";
 import Introduction from "./Coloracion/Introduction";
 
 export default function App() {
