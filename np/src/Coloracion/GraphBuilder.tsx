@@ -9,12 +9,26 @@ import {
 } from "./GiovanniDialog";
 import BattleMenu from "./BattleMenu";
 import { sprites } from "./sprites";
+import ConvertJSONToMatrix from "../utils/ConvertJSONToMatrix";
+import InfoOverlay from "./info";
+import cole from "../assets/images/cole.png";
+import geekfromgeeks from "../assets/images/geekforgeeks.png";
+
+const URL_BACKTRACKING = "http://127.0.0.1:5000/api/coloracion-backtracking";
+const URL_BACKTRACKING_GFG =
+  "http://127.0.0.1:5000/api/coloracion-backtracking-gfg";
 
 export default function GraphBuilder({
   colorBase = "blue",
 }: {
   colorBase?: "blue" | "red";
 }) {
+  const Navigate = useRef({
+    to: (path: string) => {
+      window.location.href = path;
+    },
+  }).current;
+
   const [grafo, setGrafo] = useState<{ [key: string]: string[] }>({});
   const [seleccionadas, setSeleccionadas] = useState<string[]>([]);
   const [hoveredCiudad, setHoveredCiudad] = useState<string | null>(null);
@@ -27,7 +41,25 @@ export default function GraphBuilder({
   const [modoSeleccionActiva, setModoSeleccionActiva] = useState(false);
   const [pendienteColoracion, setPendienteColoracion] = useState(false);
 
-  // use effect para medir ancho de labels para tooltip
+  const [dataBacktracking, setDataBacktracking] = useState<{
+    asignacion: { [key: string]: number };
+    colores_usados: number;
+    tiempo: number;
+    llamadas: number;
+    backtracks: number;
+  } | null>(null);
+  const [dataGFG, setDataGFG] = useState<{
+    asignacion: { [key: string]: number };
+    colores_usados: number;
+    tiempo: number;
+    llamadas: number;
+    backtracks: number;
+  } | null>(null);
+
+  const [mostrarInfoBack, setMostrarInfoBack] = useState(false);
+  const [mostrarInfoGFG, setMostrarInfoGFG] = useState(false);
+
+  //Estados de selección / grafo
   useEffect(() => {
     const newW: Record<string, number> = {};
     for (const k in textRefs.current) {
@@ -37,7 +69,7 @@ export default function GraphBuilder({
     setLabelWidths(newW);
   }, [hoveredCiudad]);
 
-  // Click en ciudad
+  // Al hacer clic en una ciudad del SVG
   const handleCiudadClick = (nombre: string) => {
     if (dialogoActivo || !modoSeleccionActiva) return;
     if (seleccionadas.length === 0) {
@@ -56,9 +88,9 @@ export default function GraphBuilder({
       setModoSeleccionActiva(false);
       return;
     }
-    setSeleccionadas((p) => [...p, nombre]);
-    setGrafo((p) => {
-      const out = { ...p };
+    setSeleccionadas((prev) => [...prev, nombre]);
+    setGrafo((prev) => {
+      const out = { ...prev };
       conex.forEach((c) => {
         out[c] = [...(out[c] || []), nombre];
         out[nombre] = [...(out[nombre] || []), c];
@@ -69,9 +101,25 @@ export default function GraphBuilder({
     setModoSeleccionActiva(false);
   };
 
-  // Selección de menú
+  // Manejador de opciones del BattleMenu
   const handleMenuSelect = async (opt: string) => {
+    if (opt === "Salir") {
+      setDialogoActivo([
+        {
+          speaker: "Giovanni",
+          text: "¡Hasta la próxima!",
+        },
+      ]);
+      setModoSeleccionActiva(false);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      Navigate.to("/");
+      return;
+    }
     if (opt === "Nueva Ubicacion") {
+      // Reiniciar selección y resultados
+      setColoracion({});
+      setDataBacktracking(null);
+      setDataGFG(null);
       setDialogoActivo(dialogos.preselecionCiudad);
       setModoSeleccionActiva(false);
     } else if (opt === "Información de Algoritmos") {
@@ -79,7 +127,6 @@ export default function GraphBuilder({
       setModoSeleccionActiva(false);
     } else if (opt === "Colorar") {
       if (!dialogoActivo) return;
-
       if (Object.keys(grafo).length === 0) {
         setDialogoActivo([
           {
@@ -90,41 +137,9 @@ export default function GraphBuilder({
         setModoSeleccionActiva(false);
         return;
       }
-      // si hay grafo, que ejecute el dialogo de preparar coloracion
-      if (Object.keys(grafo).length > 0) {
-        setDialogoActivo(dialogos.preparacion);
-        setModoSeleccionActiva(false);
-        setPendienteColoracion(true);
-        return;
-      }
-
-      //si termino el dialogo de preparacion, que ejecute la llamada a la api
-      // y despues de que termine, que ejecute el dialogo de coloracion
-      const handleColoracion = async () => {
-        const resultado = await fetch("http://localhost:5000/api/coloracion", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ grafo }),
-        });
-
-        if (resultado.status !== 200) {
-          setDialogoActivo(dialogos.resultado.fracaso);
-          setModoSeleccionActiva(false);
-          return;
-        }
-
-        const data = await resultado.json();
-        console.log(data);
-        // Usar la asignación del algoritmo greedy (o brute force si prefieres)
-        const asignacion = data.greedy.asignacion;
-        setColoracion(asignacion);
-
-        // Mostrar diálogo de éxito
-        setDialogoActivo(dialogos.resultado.exito);
-        setModoSeleccionActiva(false);
-      };
-
-      handleColoracion();
+      setDialogoActivo(dialogos.preparacion);
+      setModoSeleccionActiva(false);
+      setPendienteColoracion(true);
     } else {
       setDialogoActivo([
         { speaker: "Giovanni", text: `No puedes usar ${opt} ahora.` },
@@ -133,11 +148,12 @@ export default function GraphBuilder({
     }
   };
 
-  // Cierra diálogo y avanza estado
-  const handleDialogClose = async () => {
+  // Manejador de cierre de diálogo, avanza estados según contexto
+  let handleDialogClose = async () => {
     if (!dialogoActivo) return;
     const first = dialogoActivo[0].text;
-    // 1) Intro
+
+    // 1) Si estoy en el diálogo inicial
     if (
       dialogoActivo.length === dialogos.inicio.length &&
       first === dialogos.inicio[0].text
@@ -146,7 +162,8 @@ export default function GraphBuilder({
       setModoSeleccionActiva(false);
       return;
     }
-    // 2) Preselección
+
+    // 2) Si estoy en el diálogo de preselección
     if (
       dialogoActivo.length === dialogos.preselecionCiudad.length &&
       first === dialogos.preselecionCiudad[0].text
@@ -155,49 +172,137 @@ export default function GraphBuilder({
       setModoSeleccionActiva(true);
       return;
     }
-    // 3) Selección o error
+
+    // 3) Si acabo de pulsar "Colorar" y estoy esperando resultados
     if (pendienteColoracion) {
       setPendienteColoracion(false);
 
-      // Ejecutar el backend...
-      const resultado = await fetch("http://localhost:5000/api/coloracion", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ grafo }),
-      });
+      const body = JSON.stringify({ grafo });
+      const [resBacktracking, resGFG] = await Promise.all([
+        fetch(URL_BACKTRACKING, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body,
+        }),
+        fetch(URL_BACKTRACKING_GFG, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(ConvertJSONToMatrix(grafo)),
+        }),
+      ]);
 
-      // Esperar 2 segundos antes de mostrar el resultado
+      // Mensaje “Colocando agentes...”
       setDialogoActivo([{ speaker: "Giovanni", text: "Colocando agentes..." }]);
-      //que no se pueda skipear el dialogo
       setModoSeleccionActiva(false);
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      //Ya pasaron los 2 segundos
-      if (resultado.status !== 200) {
+      if (resBacktracking.status !== 200 || resGFG.status !== 200) {
         setDialogoActivo(dialogos.resultado.fracaso);
         setModoSeleccionActiva(false);
         return;
       }
-      const data = await resultado.json();
-      const asignacion = data.greedy.asignacion;
-      setColoracion(asignacion);
+
+      // Obtener JSON de ambas respuestas
+      const jsonBack = await resBacktracking.json();
+      const jsonGFG = await resGFG.json();
+
+      // Estados donde guardamos los datos devueltos
+      const asignBack = jsonBack.backtracking?.asignacion ?? {};
+      const coloresBack = jsonBack.backtracking?.colores_usados ?? 0;
+      const tiempoBack = jsonBack.backtracking?.tiempo ?? 0;
+      const llamadasBack = jsonBack.backtracking?.llamadas ?? 0;
+      const backtsBack = jsonBack.backtracking?.backtracks ?? 0;
+
+      // Estados donde guardamos los datos devueltos
+      const asignG = jsonGFG.backtracking?.asignacion ?? {};
+      const coloresG = jsonGFG.backtracking?.colores_usados ?? 0;
+      const tiempoG = jsonGFG.backtracking?.tiempo ?? 0;
+      const llamadasG = jsonGFG.backtracking?.llamadas ?? 0;
+      const backtsG = jsonGFG.backtracking?.backtracks ?? 0;
+
+      // Guardar en estado
+      setDataBacktracking({
+        asignacion: asignBack,
+        colores_usados: coloresBack,
+        tiempo: tiempoBack,
+        llamadas: llamadasBack,
+        backtracks: backtsBack,
+      });
+      setDataGFG({
+        asignacion: asignG,
+        colores_usados: coloresG,
+        tiempo: tiempoG,
+        llamadas: llamadasG,
+        backtracks: backtsG,
+      });
+
+      // Actualizar coloración inmediata (usamos backtracking para pintar ahora)
+      setColoracion(asignBack);
+
+      // Pasamos al diálogo de éxito
       setDialogoActivo(dialogos.resultado.exito);
       setModoSeleccionActiva(false);
       return;
     }
 
+    // 4) Tras cerrar el diálogo de éxito, mostramos el InfoOverlay de Backtracking
+    if (
+      dialogoActivo.length === dialogos.resultado.exito.length &&
+      first === dialogos.resultado.exito[0].text &&
+      dataBacktracking
+    ) {
+      setDialogoActivo(null);
+      setMostrarInfoBack(true);
+      return;
+    }
+
+    // 5) Si estoy viendo el InfoOverlay de Backtracking y el usuario presionó Shift/Espacio o hizo clic
+    if (mostrarInfoBack) {
+      setMostrarInfoBack(false);
+      // Abrir diálogo intermedio antes de pasar a GFG
+      setDialogoActivo([
+        {
+          speaker: "Giovanni",
+          text: "Ahora veamos cómo lo hizo el algoritmo de GFG...",
+        },
+      ]);
+      return;
+    }
+
+    // 6) Tras cerrar diálogo “Ahora veamos... GFG” mostramos InfoOverlay de GFG
+    if (
+      dialogoActivo.length === 1 &&
+      dialogoActivo[0].text.includes("algoritmo de GFG") &&
+      dataGFG
+    ) {
+      setDialogoActivo(null);
+      setMostrarInfoGFG(true);
+      return;
+    }
+
+    // 7) Si estoy viendo el InfoOverlay de GFG y el usuario presionó Shift/Espacio o hizo clic
+    if (mostrarInfoGFG) {
+      setMostrarInfoGFG(false);
+      // Volver a menú de batalla
+      setDialogoActivo([{ speaker: "", text: "¿Qué acción vas a hacer?" }]);
+      setModoSeleccionActiva(false);
+      return;
+    }
+
+    // Caso por defecto: volver al menú
     setDialogoActivo([{ speaker: "", text: "¿Qué acción vas a hacer?" }]);
     setModoSeleccionActiva(false);
   };
 
   return (
     <div className="fixed inset-0 w-screen h-screen bg-black">
+      {/* ------------------------------------------------------------ */}
+      {/* SVG del mapa + líneas del grafo */}
       <svg
         viewBox="0 0 1268 734"
         preserveAspectRatio="none"
         className="absolute inset-0 w-full h-full"
       >
-        {/* Imagen de fondo estirada al viewBox 1268×734 */}
         <image
           href={mapaSinnoh}
           x="0"
@@ -207,7 +312,6 @@ export default function GraphBuilder({
           preserveAspectRatio="none"
         />
 
-        {/* Líneas de conexión */}
         {Object.entries(grafo).flatMap(([o, dests]) =>
           dests.map((d) => {
             const co = ciudades.find((c) => c.nombre === o);
@@ -231,18 +335,14 @@ export default function GraphBuilder({
           })
         )}
 
-        {/* Nodos */}
         {ciudades.map((ciudad) => {
           const cx = (parseFloat(ciudad.left) / 100) * 1268;
           const cy = (parseFloat(ciudad.top) / 100) * 734;
-
           let bg = "#facc15";
           if (!seleccionadas.includes(ciudad.nombre)) {
             bg = colorBase === "red" ? "#dc2626" : "#2563eb";
           }
           const tw = labelWidths[ciudad.nombre] || 0;
-
-          // Mostrar sprite si la ciudad tiene color asignado
           const colorIndex = coloracion[ciudad.nombre];
           const spriteUrl = colorIndex ? sprites[colorIndex - 1] : null;
 
@@ -305,6 +405,8 @@ export default function GraphBuilder({
         })}
       </svg>
 
+      {/* ------------------------------------------------------------ */}
+      {/* Diálogos y BattleMenu */}
       {dialogoActivo && (
         <PokemonDialog mensajes={dialogoActivo} onClose={handleDialogClose}>
           {dialogoActivo[0].speaker === "" && (
@@ -313,6 +415,49 @@ export default function GraphBuilder({
             </div>
           )}
         </PokemonDialog>
+      )}
+
+      {/* InfoOverlay de Backtracking */}
+      {mostrarInfoBack && dataBacktracking && (
+        <InfoOverlay
+          image={cole}
+          backtracks={dataBacktracking.backtracks}
+          llamadas={dataBacktracking.llamadas}
+          colores={dataBacktracking.colores_usados}
+          tiempo={dataBacktracking.tiempo}
+          autor="William Cole"
+          description="Este algoritmo realiza una búsqueda exhaustiva por retroceso, garantizando una solución óptima aunque sea costoso en tiempo."
+          onClose={() => {
+            setMostrarInfoBack(false);
+            // Al cerrar, abrimos el diálogo intermedio:
+            setDialogoActivo([
+              {
+                speaker: "Giovanni",
+                text: "Ahora veamos cómo lo hizo el algoritmo de GFG...",
+              },
+            ]);
+          }}
+        />
+      )}
+
+      {/* InfoOverlay de GFG */}
+      {mostrarInfoGFG && dataGFG && (
+        <InfoOverlay
+          image={geekfromgeeks}
+          backtracks={dataGFG.backtracks}
+          llamadas={dataGFG.llamadas}
+          colores={dataGFG.colores_usados}
+          tiempo={dataGFG.tiempo}
+          autor="GeeksForGeeks"
+          description="Este algoritmo implementa una versión heurística de coloración. Es más rápido pero no asegura siempre la solución óptima."
+          onClose={() => {
+            setMostrarInfoGFG(false);
+            setDialogoActivo([
+              { speaker: "", text: "¿Qué acción vas a hacer?" },
+            ]);
+            setModoSeleccionActiva(false);
+          }}
+        />
       )}
     </div>
   );

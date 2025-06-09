@@ -18,6 +18,11 @@ const disks: Disk[] = [
     image: grafo,
   },
   {
+    to: "/knapsack",
+    label: "Mochila",
+    image: mochila,
+  },
+  {
     to: "https://github.com/williamstevencole/NPProblems",
     label: "GitHub",
     image: github,

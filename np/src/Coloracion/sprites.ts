@@ -13,11 +13,11 @@ export const sprites = [
   archer,
   ariana,
   buzz,
-  giovanni,
   gruntboy,
   gruntgirl,
   neil,
   petrel,
   proton,
   purple,
+  giovanni,
 ];

@@ -1,5 +1,3 @@
-//blue if in right location, red if not
-
 export type Ciudad = {
   nombre: string;
   top: string;
