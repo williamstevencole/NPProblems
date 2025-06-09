@@ -18,9 +18,9 @@ export default function Knapsack() {
   const [newItem, setNewItem] = useState<Item>({ weight: 0, value: 0 });
 
   const [greedyTime, setGreedyTime] = useState<number>(0);
-  const [dpTime, setDpTime] = useState<number>(0);
+  //const [dpTime, setDpTime] = useState<number>(0);
   const [greedyResult, setGreedyResult] = useState<number>(0);
-  const [dpResult, setDpResult] = useState<number>(0);
+  //const [dpResult, setDpResult] = useState<number>(0);
 
   const measurePerformance = () => {
     const greedyStart = performance.now();
@@ -30,15 +30,11 @@ export default function Knapsack() {
     setGreedyResult(gResult);
 
     const dpStart = performance.now();
-    const dResult = dpKnapsack(capacity, items);
+    //const dResult = dpKnapsack(capacity, items);
     const dpEnd = performance.now();
-    setDpTime(dpEnd - dpStart);
-    setDpResult(dResult);
+    //setDpTime(dpEnd - dpStart);
+    //setDpResult(dResult);
   };
-
-  useEffect(() => {
-    measurePerformance();
-  }, [items, capacity]);
 
   const addItem = () => {
     if (newItem.weight > 0 && newItem.value > 0) {
@@ -110,16 +106,18 @@ export default function Knapsack() {
         </ul>
       </div>
 
+      <button
+        onClick={measurePerformance}
+        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+      >
+        Calcular Resultados
+      </button>
+
       <div className="space-y-2">
         <div>
           <h3 className="text-xl font-bold text-green-600">Greedy (Fraccionario)</h3>
           <p>Valor máximo: {greedyResult}</p>
           <p>Tiempo de ejecución: {greedyTime.toFixed(2)} ms</p>
-        </div>
-        <div>
-          <h3 className="text-xl font-bold text-blue-600">Programación Dinámica (0/1)</h3>
-          <p>Valor máximo: {dpResult}</p>
-          <p>Tiempo de ejecución: {dpTime.toFixed(2)} ms</p>
         </div>
       </div>
     </div>
