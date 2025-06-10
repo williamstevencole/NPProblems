@@ -1,4 +1,8 @@
 import time
+# Para poder registrar los testeos 
+import json
+import os
+from datetime import datetime
 
 """
     Usaremos el hashing para optimizar la búsqueda de subconjuntos que sumen a un valor objetivo.
@@ -8,6 +12,22 @@ import time
 
     Por ahora, testeable en consola con python
 """
+
+# Ruta para guardar los resultados de los tests
+resultados_path = os.path.join(os.getcwd(), "resultados.json")
+if os.path.exists(resultados_path):
+    with open(resultados_path, "r", encoding="utf-8") as f:
+        resultados = json.load(f)
+else:
+    resultados = []
+# Calcular idTest autoincremental
+idTest = resultados[-1]["idTest"] + 1 if resultados else 1
+
+now = datetime.now()
+fecha = now.strftime("%d/%m/%Y")
+hora = now.strftime("%H:%M:%S")
+# -------------------------------------------------------------
+
 
 def subsetSumAproxWithHash(arr, target_sum):
     n = len(arr)
@@ -82,28 +102,26 @@ print("="*30)
 print("DEMOSTRACIÓN DE SUBSET SUM CON MEET-IN-THE-MIDDLE Y HASHES")
 print("="*30)
 
-arr2 = [10, 7, 5, 18, 12, 20, 1, 2, 3, 4]
-target_sum2 = 25
-start_time = time.perf_counter()
-subsetSumAproxWithHash(arr2, target_sum2)
-end_time = time.perf_counter()
-print(f"Tiempo de ejecución: {(end_time - start_time):.6f} segundos")
-print("-" * 80)
-
-arr3 = [1, 2, 3, 4, 5]
-target_sum3 = 16 # No hay subconjunto
-start_time = time.perf_counter()
-subsetSumAproxWithHash(arr3, target_sum3)
-end_time = time.perf_counter()
-print(f"Tiempo de ejecución: {(end_time - start_time):.6f} segundos")
-print("-" * 80)
 
 # Codigo personalizable para testear hasta reventar el algoritmo 
-arr_large = list(range(1, 5000)) # Números del 1 al 24
-target_sum_large = 250
-print("\nProbando con un arreglo más grande (500 elementos)...")
+arr_large = list(range(1, 1000)) # Números del 1 al 24
+target_sum_large = 1000
+print("\nProbando con un arreglo más grande (Dios sepa cuantos elementos)...")
 start_time = time.perf_counter()
 subsetSumAproxWithHash(arr_large, target_sum_large)
 end_time = time.perf_counter()
 print(f"Tiempo de ejecución: {(end_time - start_time):.6f} segundos")
 print("="*80)
+
+# Registrar los nuevos resultados
+nuevo_resultado = {
+    "idTest": idTest,
+    "fecha": fecha,
+    "hora": hora,
+    "tamaño del arreglo": len(arr_large) + 1,
+    "target": target_sum_large,
+    "tiempo tomado (en ejecucion)": round(end_time - start_time, 6)
+}
+resultados.append(nuevo_resultado)
+with open(resultados_path, "w", encoding="utf-8") as f:
+    json.dump(resultados, f, indent=4, ensure_ascii=False)

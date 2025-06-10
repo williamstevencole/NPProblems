@@ -1,0 +1,98 @@
+[
+    {
+        "idTest": 1,
+        "fecha": "10/06/2025",
+        "hora": "15:56:18",
+        "tamaño del arreglo": 998,
+        "target": 250,
+        "tiempo tomado (en ejecucion)": 211.826493
+    },
+    {
+        "idTest": 2,
+        "fecha": "10/06/2025",
+        "hora": "16:01:53",
+        "tamaño del arreglo": 199,
+        "target": 250,
+        "tiempo tomado (en ejecucion)": 0.324764
+    },
+    {
+        "idTest": 3,
+        "fecha": "10/06/2025",
+        "hora": "16:02:02",
+        "tamaño del arreglo": 199,
+        "target": 250,
+        "tiempo tomado (en ejecucion)": 0.305058
+    },
+    {
+        "idTest": 4,
+        "fecha": "10/06/2025",
+        "hora": "16:02:12",
+        "tamaño del arreglo": 299,
+        "target": 250,
+        "tiempo tomado (en ejecucion)": 1.540022
+    },
+    {
+        "idTest": 5,
+        "fecha": "10/06/2025",
+        "hora": "16:02:22",
+        "tamaño del arreglo": 399,
+        "target": 250,
+        "tiempo tomado (en ejecucion)": 5.450277
+    },
+    {
+        "idTest": 6,
+        "fecha": "10/06/2025",
+        "hora": "16:03:42",
+        "tamaño del arreglo": 100,
+        "target": 1000,
+        "tiempo tomado (en ejecucion)": 0.031274
+    },
+    {
+        "idTest": 7,
+        "fecha": "10/06/2025",
+        "hora": "16:03:52",
+        "tamaño del arreglo": 150,
+        "target": 1000,
+        "tiempo tomado (en ejecucion)": 0.101139
+    },
+    {
+        "idTest": 8,
+        "fecha": "10/06/2025",
+        "hora": "16:03:59",
+        "tamaño del arreglo": 200,
+        "target": 1000,
+        "tiempo tomado (en ejecucion)": 0.290363
+    },
+    {
+        "idTest": 9,
+        "fecha": "10/06/2025",
+        "hora": "16:04:06",
+        "tamaño del arreglo": 250,
+        "target": 1000,
+        "tiempo tomado (en ejecucion)": 0.714003
+    },
+    {
+        "idTest": 10,
+        "fecha": "10/06/2025",
+        "hora": "16:04:14",
+        "tamaño del arreglo": 300,
+        "target": 1000,
+        "tiempo tomado (en ejecucion)": 1.637726
+    },
+    {
+        "idTest": 11,
+        "fecha": "10/06/2025",
+        "hora": "16:04:22",
+        "tamaño del arreglo": 500,
+        "target": 1000,
+        "tiempo tomado (en ejecucion)": 13.618154
+    },
+    {
+        "idTest": 12,
+        "fecha": "10/06/2025",
+        "hora": "16:04:44",
+        "tamaño del arreglo": 1000,
+        "target": 1000,
+        "tiempo tomado (en ejecucion)": 215.764954
+    }
+]
