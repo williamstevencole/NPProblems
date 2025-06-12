@@ -1,45 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import { greedyKnapsack } from './greedyKnapsack';
-import { dpKnapsack } from './dpKnapsack';
+import { useState} from 'react';
+import { memoizedKnapsack } from './AlgoritmoKnapsack';
+import { Button, InputNumber, message, Row } from "antd";
+import IncludedItemsTable from './tablaAll';
+import ExcludedItemsTable from './tablaFuera';
 
 interface Item {
-  weight: number;
-  value: number;
+  peso: number;
+  valor: number;
 }
 
 export default function Knapsack() {
   const [items, setItems] = useState<Item[]>([
-    { weight: 2, value: 300 },
-    { weight: 1, value: 200 },
-    { weight: 5, value: 400 },
-    { weight: 3, value: 500 },
+
   ]);
+  const [randomCount, setRandomCount] = useState(0);
   const [capacity, setCapacity] = useState<number>(10);
-  const [newItem, setNewItem] = useState<Item>({ weight: 0, value: 0 });
+  const [newItem, setNewItem] = useState<Item>({ peso: 0, valor: 0 });
 
-  const [greedyTime, setGreedyTime] = useState<number>(0);
-  //const [dpTime, setDpTime] = useState<number>(0);
-  const [greedyResult, setGreedyResult] = useState<number>(0);
-  //const [dpResult, setDpResult] = useState<number>(0);
+  const [Time, setTime] = useState<number>(0);
+  const [greedyResult, setResult] = useState<number>(0);
 
-  const measurePerformance = () => {
-    const greedyStart = performance.now();
-    const gResult = greedyKnapsack(capacity, items);
-    const greedyEnd = performance.now();
-    setGreedyTime(greedyEnd - greedyStart);
-    setGreedyResult(gResult);
+  const [includedItems, setIncludedItems] = useState<Item[]>([]);
+  const [excludedItems, setExcludedItems] = useState<Item[]>([]);
 
-    const dpStart = performance.now();
-    //const dResult = dpKnapsack(capacity, items);
-    const dpEnd = performance.now();
-    //setDpTime(dpEnd - dpStart);
-    //setDpResult(dResult);
+const measurePerformance = () => {
+  const { totalValue, selectedItems, notSelectedItems,tiempo } = memoizedKnapsack(capacity, items);
+ 
+  setTime(tiempo);
+  setResult(totalValue);
+  setIncludedItems(selectedItems);
+  setExcludedItems(notSelectedItems);
+};
+
+   const addRandomItems = () => {
+    if (randomCount <= 0) {
+      message.error("La cantidad debe ser mayor a 0.");
+      return;
+    }
+
+    const randomItems = Array.from({ length: randomCount }, (_, i) => ({
+      name: `Item ${items.length + i + 1}`,
+      peso: Math.floor(Math.random() * 100) + 1,
+      valor: Math.floor(Math.random() * 200) + 1,
+      key: items.length + i,
+    }));
+
+    setItems([...items, ...randomItems]);
+    message.success(`${randomCount} artículos aleatorios agregados.`);
   };
 
   const addItem = () => {
-    if (newItem.weight > 0 && newItem.value > 0) {
+    if (newItem.peso > 0 && newItem.valor > 0) {
       setItems([...items, newItem]);
-      setNewItem({ weight: 0, value: 0 });
+      setNewItem({ peso: 0, valor: 0 });
     }
   };
 
@@ -65,26 +78,55 @@ export default function Knapsack() {
 
       <div className="space-y-2">
         <h2 className="font-semibold">Agregar nuevo ítem</h2>
+        <Row>
+        <div>
+        <p>Peso</p>
         <input
           type="number"
           placeholder="Peso"
-          value={newItem.weight}
-          onChange={(e) => setNewItem({ ...newItem, weight: parseFloat(e.target.value) })}
+          value={newItem.peso}
+          onChange={(e) => setNewItem({ ...newItem, peso: parseFloat(e.target.value) })}
           className="border rounded p-2 mr-2"
         />
+        </div>
+        <div>
+          <p>Valor</p>
         <input
           type="number"
           placeholder="Valor"
-          value={newItem.value}
-          onChange={(e) => setNewItem({ ...newItem, value: parseFloat(e.target.value) })}
+          value={newItem.valor}
+          onChange={(e) => setNewItem({ ...newItem, valor: parseFloat(e.target.value) })}
           className="border rounded p-2 mr-2"
         />
+        </div>
+        </Row>
         <button
           onClick={addItem}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
           Agregar
         </button>
+        <br></br>
+        <br/>
+       <InputNumber
+  placeholder="Cantidad de ítems aleatorios"
+  value={randomCount}
+  onChange={(value) => {
+    if (value === null || isNaN(value)) {
+      setRandomCount(0);
+    } else if (value >= 0) {
+      setRandomCount(value);
+    } else {
+      message.error("La cantidad debe ser un número positivo.");
+    }
+  }}
+  min={0}
+  style={{ width: "200px", marginRight: "10px" }}
+/>
+
+        <Button type="primary" onClick={addRandomItems} style={{ marginRight: "10px" }}>
+          Agregar Aleatorios
+        </Button>
       </div>
 
       <div>
@@ -93,7 +135,7 @@ export default function Knapsack() {
           {items.map((item, idx) => (
             <li key={idx} className="flex justify-between items-center">
               <span>
-                Peso: {item.weight}, Valor: {item.value}, Eficiencia: {(item.value / item.weight).toFixed(2)}
+                Peso: {item.peso}, Valor: {item.valor}, Eficiencia: {(item.valor / item.peso).toFixed(2)}
               </span>
               <button
                 onClick={() => removeItem(idx)}
@@ -113,11 +155,23 @@ export default function Knapsack() {
         Calcular Resultados
       </button>
 
+      <div className="mt-4">
+        <Row>
+        <div>
+        <h2 className="font-bold text-lg">Ítems en la mochila</h2>
+        <IncludedItemsTable data={includedItems} />
+        </div>
+        <div>
+  <h2 className="font-bold text-lg">Ítems fuera de la mochila</h2>
+  <ExcludedItemsTable data={excludedItems} />
+  </div>
+  </Row>
+      </div>
       <div className="space-y-2">
         <div>
           <h3 className="text-xl font-bold text-green-600">Greedy (Fraccionario)</h3>
           <p>Valor máximo: {greedyResult}</p>
-          <p>Tiempo de ejecución: {greedyTime.toFixed(2)} ms</p>
+          <p>Tiempo de ejecución: {Time.toFixed(2)} ms</p>
         </div>
       </div>
     </div>
