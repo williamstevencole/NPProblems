@@ -65,36 +65,49 @@ def coloracion_backtracking_gfg():
 # Endpoint 2: Backtracking tipo diccionario sin matriz de adyacencia
 @app.route('/api/coloracion-backtracking', methods=['POST'])
 def coloracion_backtracking_endpoint():
-    data = request.get_json()
-    grafo = data.get('grafo')
+    data = request.get_json() # Obtener los datos del cuerpo de la solicitud
+    grafo = data.get('grafo') # Obtener el grafo del JSON
 
     if not grafo:
         return jsonify({"error": "No se proporcionó un grafo"}), 400
 
-    nodos = list(grafo.keys())
+    # setea los nodos y colores máximos
+    nodos = list(grafo.keys()) 
     max_colores = len(nodos)
     llamadas = 0
     backtracks = 0
 
-    def es_valido(asignacion, nodo, color):
+    def es_valido(asignacion, nodo, color) -> bool:
+        """
+        Verifica si es válido asignar un color a un nodo, en base a los colores asignados a sus vecinos.
+        Si su vecino tiene un color diferente al color asignado al nodo, retorna True.
+        """
         return all(asignacion.get(vecino) != color for vecino in grafo[nodo])
 
-    def backtrack(index, asignacion):
+    def backtrack(index, asignacion) -> bool:
+        """
+        Función recursiva de backtracking para intentar asignar colores a los nodos.
+        Se incrementan los contadores de llamadas y backtracks.
+        Si se asigna un color válido a un nodo, se llama recursivamente para el siguiente nodo.
+        Si se llega al final de los nodos, se retorna True.
+        Si no se puede asignar un color válido, se deshace la asignación y se incrementa el contador de backtracks.
+        """
         nonlocal llamadas, backtracks
         llamadas += 1
-        if index == len(nodos):
+        if index == len(nodos): # Si hemos asignado colores a todos los nodos, terminamos
             return True
         nodo = nodos[index]
-        for color in range(1, max_colores + 1):
-            if es_valido(asignacion, nodo, color):
-                asignacion[nodo] = color
-                if backtrack(index + 1, asignacion):
-                    return True
+        for color in range(1, max_colores + 1): # recorre todos los colores posibles
+            if es_valido(asignacion, nodo, color): # Verificar si es válido asignar el color al nodo
+                asignacion[nodo] = color # Asignar el color al nodo
+                if backtrack(index + 1, asignacion): # Llamada recursiva para el siguiente nodo
+                    return True 
+                # Deshacer la asignación si no es válida
                 del asignacion[nodo]
                 backtracks += 1
         return False
 
-    asignacion = {}
+    asignacion: dict[str , int] = {}
     inicio = time.perf_counter()
     exito = backtrack(0, asignacion)
     fin = time.perf_counter()
