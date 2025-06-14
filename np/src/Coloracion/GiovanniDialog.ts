@@ -19,10 +19,6 @@ const dialogoIntroduccionJustificada: Mensaje[] = [
   },
   {
     speaker: "Giovanni",
-    text: "Silenciosamente. Estrategicamente. Ciudad por ciudad. Ruta por ruta.",
-  },
-  {
-    speaker: "Giovanni",
     text: "Y tu... seras mi instrumento en esta operacion.",
   },
 ];
@@ -46,17 +42,21 @@ const dialogoInicio: Mensaje[] = [
   },
   {
     speaker: "Giovanni",
-    text: "Todavia no asignaremos agentes... Eso vendra despues.",
-  },
-  {
-    speaker: "Giovanni",
     text: "Recuerda: si dos ciudades estan conectadas, no pueden tener al mismo agente.",
   },
   {
     speaker: "Giovanni",
-    text: "Hazlo bien... y controlaras Sinnoh. Hazlo mal... y no volveras a tener una mision.",
+    text: "Hazlo bien... y controlaras Sinnoh.",
   },
-  { speaker: "Giovanni", text: "Comienza. Estoy observando cada movimiento." },
+  {
+    speaker: "Giovanni",
+    text: "Hazlo mal... y sera tu fin.",
+  },
+  {
+    speaker: "Giovanni",
+    text: "En el equipo Rocket no aceptamos fracasos.",
+  },
+  { speaker: "Giovanni", text: "Comencemos." },
 ];
 
 const dialogoPreselecionCiudad: Mensaje[] = [
@@ -96,44 +96,6 @@ const dialogoPrepararColoracion: Mensaje[] = [
     text: "...pero si fallas, no solo perderas la mision. Perderas mi confianza.",
   },
   { speaker: "Giovanni", text: "Ejecutando operacion... preparate." },
-];
-
-const dialogoSeleccionarAlgoritmoGreedy: Mensaje[] = [
-  {
-    speaker: "Giovanni",
-    text: "Has elegido el metodo rapido... el algoritmo greedy.",
-  },
-  {
-    speaker: "Giovanni",
-    text: "No garantiza la solucion perfecta... pero puede ser suficiente si jugaste bien tus cartas.",
-  },
-];
-
-export const dialogoSeleccionarAlgoritmoBruteForce: Mensaje[] = [
-  {
-    speaker: "Giovanni",
-    text: "Fuerza bruta? Hmm... Veo que estas dispuesto a ir al limite.",
-  },
-  {
-    speaker: "Giovanni",
-    text: "Esto llevara tiempo... pero podrias encontrar la solucion exacta, si es que existe.",
-  },
-];
-
-const dialogoTerminarMision: Mensaje[] = [
-  { speaker: "Giovanni", text: "Listo para ejecutar la operacion?" },
-  {
-    speaker: "Giovanni",
-    text: "Muy bien... asignare a nuestros agentes en las ciudades seleccionadas.",
-  },
-  {
-    speaker: "Giovanni",
-    text: "Si tus conexiones son debiles, lo descubriras en segundos.",
-  },
-  {
-    speaker: "Giovanni",
-    text: "Comenzando la fase final. Que Arceus tenga piedad si fallas...",
-  },
 ];
 
 const dialogoExito: Mensaje[] = [
@@ -181,31 +143,11 @@ export const informacionAlgoritmos: Mensaje[] = [
   },
   {
     speaker: "Giovanni",
-    text: "Es infalible y garantiza la solución **óptima**, pero con un mapa tan grande puede consumir mucho tiempo… tiempo que nuestro enemigo podría aprovechar.",
+    text: "Es infalible y garantiza la solución **óptima**, pero con un mapa tan grande puede consumir mucho tiempo y recursos…",
   },
   {
     speaker: "Giovanni",
     text: "Imagina enviar un ejército completo a cada ciudad, uno tras otro, hasta asegurar que no hay conflicto. Preciso… pero lento.",
-  },
-  {
-    speaker: "Giovanni",
-    text: "En cambio, el algoritmo greedy actúa con **rapidez**. Asigna un agente a la ciudad más crítica primero, luego al siguiente, siempre eligiendo lo que parezca mejor en cada paso.",
-  },
-  {
-    speaker: "Giovanni",
-    text: "Esta estrategia voraz reduce drásticamente el tiempo de cómputo. Sin embargo, al tomar decisiones locales puede dejar **puntos débiles** en la red.",
-  },
-  {
-    speaker: "Giovanni",
-    text: "En síntesis: \n• **Fuerza bruta** = paciencia, exhaustividad, seguridad absoluta, pero lento.",
-  },
-  {
-    speaker: "Giovanni",
-    text: "\n• **Greedy** = rapidez, eficiencia, riesgo calculado, pero no 100% infalible.",
-  },
-  {
-    speaker: "Giovanni",
-    text: "Tú decides: ¿arriesgarás velocidad para cubrir más terreno rápidamente, o asegurarás cada paso aunque te cueste más tiempo?",
   },
   {
     speaker: "Giovanni",
@@ -219,11 +161,6 @@ export const dialogos = {
   preselecionCiudad: dialogoPreselecionCiudad,
   seleccionCiudad: getDialogoSeleccionCiudad,
   preparacion: dialogoPrepararColoracion,
-  menu: {
-    algoritmoGreedy: dialogoSeleccionarAlgoritmoGreedy,
-    algoritmoBruteForce: dialogoSeleccionarAlgoritmoBruteForce,
-    terminarMision: dialogoTerminarMision,
-  },
   resultado: {
     exito: dialogoExito,
     fracaso: dialogoFracaso,

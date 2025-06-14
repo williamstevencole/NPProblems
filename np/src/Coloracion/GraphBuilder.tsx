@@ -426,10 +426,9 @@ export default function GraphBuilder({
           colores={dataBacktracking.colores_usados}
           tiempo={dataBacktracking.tiempo}
           autor="William Cole"
-          description="Este algoritmo realiza una búsqueda exhaustiva por retroceso, garantizando una solución óptima aunque sea costoso en tiempo."
+          description="Este algoritmo realiza una búsqueda exhaustiva por retroceso, garantizando una solución óptima aunque costosa en tiempo."
           onClose={() => {
             setMostrarInfoBack(false);
-            // Al cerrar, abrimos el diálogo intermedio:
             setDialogoActivo([
               {
                 speaker: "Giovanni",
@@ -448,7 +447,7 @@ export default function GraphBuilder({
           llamadas={dataGFG.llamadas}
           colores={dataGFG.colores_usados}
           tiempo={dataGFG.tiempo}
-          autor="GeeksForGeeks"
+          autor="Raja Ramakrishna"
           description="Este algoritmo implementa una versión heurística de coloración. Es más rápido pero no asegura siempre la solución óptima."
           onClose={() => {
             setMostrarInfoGFG(false);

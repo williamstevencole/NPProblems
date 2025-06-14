@@ -35,9 +35,9 @@ export const ciudades: Ciudad[] = [
 ];
 
 export const conexiones: { [ciudad: string]: string[] } = {
-  "Pal Park": ["Twinleaf Town"],
+  "Pal Park": ["Twinleaf Town", "Sandgem Town"],
   "Twinleaf Town": ["Sandgem Town", "Pal Park"],
-  "Sandgem Town": ["Twinleaf Town", "Jubilife City"],
+  "Sandgem Town": ["Twinleaf Town", "Jubilife City", "Pal Park"],
   "Jubilife City": [
     "Sandgem Town",
     "Oreburgh City",
@@ -83,6 +83,7 @@ export const conexiones: { [ciudad: string]: string[] } = {
     "Pastoria City",
     "Sunyshore City",
     "Celestic Town",
+    "Resort Area",
   ],
   "Pastoria City": ["Hearthome City", "Veilstone City", "Sunyshore City"],
   "Sunyshore City": ["Pastoria City", "Veilstone City", "Sinnoh League"],
@@ -96,6 +97,7 @@ export const conexiones: { [ciudad: string]: string[] } = {
     "Sinnoh League",
     "Survival Area",
     "Stark Mountain",
+    "Veilstone City",
   ],
   "Mount Coronet": [
     "Oreburgh City",

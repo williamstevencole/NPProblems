@@ -103,7 +103,7 @@ export default function PokemonDialog({
   return (
     <div
       className={`absolute -bottom-6 left-0 w-full flex items-center justify-center pointer-events-none z-50 transition-all duration-500 ease-in-out  px-40${
-        isCollapsed ? "translate-y-full opacity-30" : "bottom-[-130px]"
+        isCollapsed ? "-translate-y-50 opacity-10" : "translate-y-0 opacity-100"
       }`}
     >
       <div
