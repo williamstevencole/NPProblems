@@ -4,6 +4,8 @@ import grafo from "../assets/images/grafo.png";
 import github from "../assets/images/github.png";
 import docs from "../assets/images/docs.png";
 import mochila from "../assets/images/mochila.png";
+import reconciliacion from "../assets/images/Reconciliación-bancaria.png";
+
 
 type Disk = {
   to: string;
@@ -21,6 +23,11 @@ const disks: Disk[] = [
     to: "/knapsack",
     label: "Knapsack",
     image: mochila,
+  },
+  {
+    to: "/subsetsum",
+    label: "Subset Sum",
+    image: reconciliacion,
   },
   {
     to: "https://github.com/williamstevencole/NPProblems",
