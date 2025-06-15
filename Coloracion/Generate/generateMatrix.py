@@ -1,27 +1,48 @@
-import random
 import json
 
-def generar_matriz_adyacencia(n, conexiones_por_nodo):
+def convert_graph_to_adjacency_matrix(graph_data):
+    # Extract the graph from the data
+    graph = graph_data.get("grafo", {})
+    
+    # Get all unique nodes
+    all_nodes = sorted(list(graph.keys()))
+    n = len(all_nodes)
+    
+    # Create a mapping from node names to indices
+    node_to_index = {node: i for i, node in enumerate(all_nodes)}
+    
+    # Initialize the adjacency matrix with zeros
     matriz = [[0 for _ in range(n)] for _ in range(n)]
+    
+    # Fill the adjacency matrix based on the graph
+    for node, connections in graph.items():
+        node_idx = node_to_index[node]
+        for connection in connections:
+            if connection in node_to_index:  # Check if the connection exists in the node list
+                conn_idx = node_to_index[connection]
+                matriz[node_idx][conn_idx] = 1
+    
+    return matriz, all_nodes
 
-    for i in range(n):
-        posibles_vecinos = [j for j in range(n) if j != i and matriz[i][j] == 0]
-        vecinos = random.sample(posibles_vecinos, min(conexiones_por_nodo, len(posibles_vecinos)))
-        for j in vecinos:
-            matriz[i][j] = 1
-            matriz[j][i] = 1  # grafo no dirigido
+# Path to the input graph file
+input_file = "grafo15_aleatorio_con_max_9_conexiones.json"
 
-    return matriz
+# Load the graph from the JSON file
+with open(input_file, "r") as f:
+    graph_data = json.load(f)
 
-n = 20
-conexiones_por_nodo = 1
+# Convert the graph to adjacency matrix
+matriz, nodes = convert_graph_to_adjacency_matrix(graph_data)
 
-matriz = generar_matriz_adyacencia(n, conexiones_por_nodo)
-
-# Envolvemos la matriz en un diccionario con la clave "matriz"
+# Prepare the output
 output = {
-    "matriz": matriz
+    "matriz": matriz,
+    "nodos": nodes
 }
 
-with open(f"matriz_adyacencia_{n}_{conexiones_por_nodo}.json", "w") as f:
+# Save the adjacency matrix to a file
+output_file = f"matriz_adyacencia_from_graph.json"
+with open(output_file, "w") as f:
     json.dump(output, f, indent=2)
+
+print(f"✅ Matriz de adyacencia generada y guardada como '{output_file}'")
