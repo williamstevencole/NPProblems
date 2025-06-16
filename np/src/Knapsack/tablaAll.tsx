@@ -10,7 +10,19 @@ interface Props {
 }
 
 const IncludedItemsTable = ({ data }: Props) => {
+  // Agrega el índice absoluto a cada item
+  const dataWithIndex = data.map((item, index) => ({
+    ...item,
+    key: index,
+    index: index + 1, // índice absoluto visible
+  }));
+
   const columns = [
+    {
+      title: '#',
+      dataIndex: 'index', // ahora se usa directamente desde el data
+      key: 'index',
+    },
     {
       title: 'Peso',
       dataIndex: 'peso',
@@ -25,23 +37,20 @@ const IncludedItemsTable = ({ data }: Props) => {
       title: 'Eficiencia (valor/peso)',
       key: 'eficiencia',
       render: (_: any, record: Item) => {
-        const eficiencia = record.peso !== 0 ? (record.valor / record.peso).toFixed(2) : 'N/A';
+        const eficiencia =
+          record.peso !== 0 ? (record.valor / record.peso).toFixed(2) : 'N/A';
         return eficiencia;
       },
     },
   ];
-  
-  const dataWithKeys = data.map((item, index) => ({
-    ...item,
-    key: index,
-  }));
 
   return (
     <Table
       columns={columns}
-      dataSource={dataWithKeys}
+      dataSource={dataWithIndex}
       pagination={{ pageSize: 5 }}
     />
   );
 };
+
 export default IncludedItemsTable;

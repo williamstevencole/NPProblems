@@ -1,9 +1,10 @@
 import { useState} from 'react';
 import { memoizedKnapsack } from './AlgoritmoKnapsack';
-import { Button, InputNumber, message, Row } from "antd";
+import { Button, InputNumber, message, Row,Col } from "antd";
 import IncludedItemsTable from './tablaAll';
 import ExcludedItemsTable from './tablaFuera';
-
+import AllItems from './TablaItems';
+import { knapsackTabulation } from './Tabulacion';
 interface Item {
   peso: number;
   valor: number;
@@ -25,8 +26,7 @@ export default function Knapsack() {
 
 const measurePerformance = () => {
   const { totalValue, selectedItems, notSelectedItems,tiempo } = memoizedKnapsack(capacity, items);
- 
-  setTime(tiempo);
+  setTime(tiempo/1000);
   setResult(totalValue);
   setIncludedItems(selectedItems);
   setExcludedItems(notSelectedItems);
@@ -130,48 +130,39 @@ const measurePerformance = () => {
       </div>
 
       <div>
-        <h2 className="font-semibold">Items:</h2>
-        <ul className="list-disc ml-5">
-          {items.map((item, idx) => (
-            <li key={idx} className="flex justify-between items-center">
-              <span>
-                Peso: {item.peso}, Valor: {item.valor}, Eficiencia: {(item.valor / item.peso).toFixed(2)}
-              </span>
-              <button
-                onClick={() => removeItem(idx)}
-                className="text-red-500 ml-4 hover:underline"
-              >
-                Eliminar
-              </button>
-            </li>
-          ))}
-        </ul>
+       <AllItems items={items} removeItem={removeItem} />
       </div>
 
       <button
         onClick={measurePerformance}
+        style={{marginLeft:"45%"
+        }}
         className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
       >
         Calcular Resultados
       </button>
 
       <div className="mt-4">
-        <Row>
-        <div>
-        <h2 className="font-bold text-lg">Ítems en la mochila</h2>
+  <Row justify="center" gutter={300}>
+    <Col>
+      <div className="text-center">
+        <h2 className="font-bold text-lg mb-2">Ítems en la mochila</h2>
         <IncludedItemsTable data={includedItems} />
-        </div>
-        <div>
-  <h2 className="font-bold text-lg">Ítems fuera de la mochila</h2>
-  <ExcludedItemsTable data={excludedItems} />
-  </div>
-  </Row>
       </div>
+    </Col>
+    <Col>
+      <div className="text-center">
+        <h2 className="font-bold text-lg mb-2">Ítems fuera de la mochila</h2>
+        <ExcludedItemsTable data={excludedItems} />
+      </div>
+    </Col>
+  </Row>
+</div>
       <div className="space-y-2">
         <div>
-          <h3 className="text-xl font-bold text-green-600">Greedy (Fraccionario)</h3>
+          <h3 className="text-xl font-bold text-green-600">KnapSack (Memorización)</h3>
           <p>Valor máximo: {greedyResult}</p>
-          <p>Tiempo de ejecución: {Time.toFixed(2)} ms</p>
+          <p>Tiempo de ejecución: {Time} s</p>
         </div>
       </div>
     </div>

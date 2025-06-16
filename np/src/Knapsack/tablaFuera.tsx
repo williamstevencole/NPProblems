@@ -10,7 +10,19 @@ interface Props {
 }
 
 const ExcludedItemsTable = ({ data }: Props) => {
+  // Agregar un índice absoluto (estable y único)
+  const dataWithKeys = data.map((item, index) => ({
+    ...item,
+    key: index,
+    index: index + 1, // índice absoluto (1-based)
+  }));
+
   const columns = [
+    {
+      title: '#',
+      dataIndex: 'index', // ahora se usa directamente
+      key: 'index',
+    },
     {
       title: 'Peso',
       dataIndex: 'peso',
@@ -24,17 +36,10 @@ const ExcludedItemsTable = ({ data }: Props) => {
     {
       title: 'Eficiencia (valor/peso)',
       key: 'eficiencia',
-      render: (_: any, record: Item) => {
-        const eficiencia = record.peso !== 0 ? (record.valor / record.peso).toFixed(2) : 'N/A';
-        return eficiencia;
-      },
+      render: (_: any, record: Item) =>
+        record.peso !== 0 ? (record.valor / record.peso).toFixed(2) : 'N/A',
     },
   ];
-
-  const dataWithKeys = data.map((item, index) => ({
-    ...item,
-    key: index,
-  }));
 
   return (
     <Table
