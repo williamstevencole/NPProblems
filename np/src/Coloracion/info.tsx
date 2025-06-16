@@ -24,15 +24,12 @@ const InfoOverlay = ({
 }: InfoProps) => {
   const [, setLabelWidths] = useState<Record<string, number>>({});
   const [opacity, setOpacity] = useState(0);
-  const [translateY, setTranslateY] = useState(100); // Start offscreen (100%)
+  const [translateY, setTranslateY] = useState(100);
   const textRefs = useRef<Record<string, SVGTextElement | null>>({});
 
-  // Fade in and slide up effect when component mounts
   useEffect(() => {
-    // Start with 0 opacity and translated down
     setOpacity(0);
     setTranslateY(100);
-    // After a small delay, animate to full opacity and position
     const timer = setTimeout(() => {
       setOpacity(1);
       setTranslateY(0);
@@ -49,7 +46,6 @@ const InfoOverlay = ({
     setLabelWidths(newW);
   }, [backtracks, llamadas, colores, tiempo]);
 
-  // Listener para cerrar al presionar Shift, Espacio o clic en toda la pantalla
   useEffect(() => {
     const handler = (e: KeyboardEvent | MouseEvent) => {
       if (e instanceof KeyboardEvent && (e.key === " " || e.key === "Shift")) {
@@ -177,6 +173,7 @@ const InfoOverlay = ({
               wordWrap: "break-word",
               overflow: "hidden",
               textAlign: "start",
+              paddingLeft: "20px",
             }}
           >
             {description}

@@ -1,15 +1,21 @@
 import time
 
-def coloracion_backtracking(grafo):
+def coloracion_backtracking(grafo) -> dict:
     nodos = list(grafo.keys())
     max_colores = len(nodos)
+
     llamadas = 0
     backtracks = 0
 
-    def es_valido(asignacion, nodo, color):
-        return all(asignacion.get(vecino) != color for vecino in grafo[nodo])
+    #def es_valido(asignacion, nodo, color) -> bool:
+        #return all(asignacion.get(vecino) != color for vecino in grafo[nodo])
+    def es_valido(asignacion, nodo, color) -> bool:
+        for vecino in grafo[nodo]:
+            if vecino in asignacion and asignacion[vecino] == color:
+                return False
+        return True
 
-    def backtrack(index, asignacion):
+    def backtrack(index, asignacion) -> bool:
         nonlocal llamadas, backtracks
         llamadas += 1
         if index == len(nodos):
@@ -25,7 +31,7 @@ def coloracion_backtracking(grafo):
         return False
 
     asignacion = {}
-    inicio = time.perf_counter()
+    inicio = time.perf_counter()  
     exito = backtrack(0, asignacion)
     fin = time.perf_counter()
 
