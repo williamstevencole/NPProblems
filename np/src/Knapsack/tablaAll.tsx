@@ -45,11 +45,18 @@ const IncludedItemsTable = ({ data }: Props) => {
   ];
 
   return (
+    <div style={{
+  background: 'linear-gradient(135deg,rgb(161, 247, 140),rgb(139, 251, 35))',
+  padding: '2rem',
+  boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+  borderRadius: '12px'
+}}>
     <Table
       columns={columns}
       dataSource={dataWithIndex}
       pagination={{ pageSize: 5 }}
     />
+    </div>
   );
 };
 

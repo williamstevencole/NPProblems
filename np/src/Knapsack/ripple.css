@@ -1,0 +1,40 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+}
+
+.ripple-effect {
+  text-decoration: none;
+  font-weight: 500;
+  position: relative;
+  font-size: 14px;
+  color: #333;
+  background-color: #ddd;
+  display: block;
+  padding: 14px 20px;
+  border-radius: 10px;
+  overflow: hidden;
+  div {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    border-radius: 50rem;
+    background-color: red;
+    animation: rippleEffect 1s linear infinite;
+  }
+}
+
+@keyframes rippleEffect {
+  from {
+    width: 0;
+    height: 0;
+    opacity: .5;
+  }
+  to {
+    width: 500px;
+    height: 500px;
+    opacity: 0;
+  }
+}

@@ -1,0 +1,40 @@
+.card {
+  padding: 12px;
+  background: linear-gradient(90deg,
+    #ff0000 0%,
+    #ff9a00 10%,
+    #d0de21 20%,
+    #4fdc4a 30%,
+    #3fdad8 40%,
+    #2fc9e2 50%,
+    #1c7fee 60%,
+    #5f15f2 70%,
+    #ba0cf8 80%,
+    #fb07d9 90%,
+    #ff0000 100%
+  );
+  border-radius: 10px;
+  background-size: 200% 200%;
+  animation: anim 2s linear infinite;
+}
+.card__body {
+  width: 100%;
+  height: 100%;
+  background-color: #121212;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card_title {
+color:white;
+text-transform: uppercase;
+letter-spacing: 5px;
+}
+@keyframes anim
+{
+    100%
+    {
+        background-position-x: -200%;
+    }
+}

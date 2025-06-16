@@ -1,0 +1,36 @@
+.rainbow-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  border: 0;
+  font-size: 14px;
+  padding: 25px 45px;
+  display: inline-block;
+  color: #fff;
+  text-transform: uppercase;
+  border-radius: 500px;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(
+    270deg,
+    #ff416c,
+    #ff4b2b,
+    #ffeb3b,
+    #00ff87,
+    #00c6ff,
+    #8e2de2,
+    #ff416c
+  );
+  background-size: 300% 300%;
+  animation: rainbow-flow 3s ease infinite;
+}
+
+@keyframes rainbow-flow {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 100% center;
+  }
+}
