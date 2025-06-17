@@ -7,6 +7,7 @@ import AllItems from './TablaItems';
 import ExpandableCard from './Info';
 import "./but.css"
 import "./bu.css"
+import Radioalgo from './radio';
 import titulo from "./titulo.png"
 interface Item {
   peso: number;
@@ -193,6 +194,10 @@ const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
   <AllItems items={items} removeItem={removeItem} />
  <br></br>
       </div>
+     <div style={{ width: "500px", margin: "0 auto" }}>
+      <Radioalgo></Radioalgo>
+     </div>
+     <br></br>
         <div className="container">
         <button className="button-creative"
         ref={buttonRef}

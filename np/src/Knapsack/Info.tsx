@@ -168,30 +168,39 @@ export default function ExpandableCard(){
               }}
             >
               <h4 style={{ fontSize: "1.2em", fontWeight: 600 }}>
-                Title: The Enigmatic Smile of Mona Lisa
+                Problema NP: 0/1 KnapSack
               </h4>
               <p>
-                Unveil the allure of the world-renowned masterpiece, the Mona
-                Lisa, displayed in the heart of the Louvre Museum in Paris.
-                Painted by the illustrious Leonardo da Vinci between 1503 and
-                1506, this portrait is celebrated for Mona Lisa's enigmatic
-                smile that seems to change depending on the viewing angle.
+              Imagina que eres un ladrón que roba una exhibición de museo 
+              llena de joyas, eres nuevo en esto, así que solo llevas 
+              una mochila. Tu objetivo debería ser llevarte los objetos 
+              más valiosos sin sobrecargarla hasta que se rompa o se 
+              vuelva demasiado pesada. ¿Cómo eliges entre los objetos 
+              para maximizar tu botín? Podrías hacer una lista 
+              de todos los artefactos y sus pesos para calcular la 
+              respuesta a mano. Pero cuantos más objetos haya, más difícil 
+              se vuelve este cálculo para una persona o una computadora.
               </p>
               <p>
-                The exquisite blending of light and shadow, known as sfumato,
-                contributes to the mystique of her expression. Da Vinci’s
-                remarkable attention to detail is evident in the delicate
-                veiling and the meticulous background landscapes that frame Mona
-                Lisa's serene demeanor.
+              El problema de la mochila pertenece a la clase de problemas "NP", 
+              que significa "tiempo polinómico no determinista". El nombre hace 
+              referencia a cómo estos problemas obligan a una computadora a 
+              realizar muchos pasos para llegar a una solución, y el número 
+              aumenta drásticamente según el tamaño de las entradas; 
+              por ejemplo, el inventario de artículos disponibles al llenar 
+              una mochila. Por definición, los problemas NP también tienen 
+              soluciones fáciles de verificar (sería trivial comprobar 
+              que una lista de artículos cabe en una mochila).
               </p>
               <p>
-                The artistry and the mysteries enveloping the Mona Lisa continue
-                to captivate audiences, making it an enduring symbol of the
-                Renaissance era. Experience the magnetism of the Mona Lisa, a
-                testament to Leonardo da Vinci's genius, and delve into a visual
-                dialogue with a smile that has intrigued the world for
-                centuries.
+              En pequeños experimentos en los que se pidió a los participantes 
+              que llenaran una mochila en la pantalla de una computadora con 
+              artículos que tenían valores y pesos establecidos, las personas 
+              tendieron a tener más dificultades para optimizar el contenido 
+              de la mochila a medida que aumentaba el número de opciones de 
+              artículos (el mismo problema que tienen las computadoras).
               </p>
+              
             </section>
           )}
         </div>
