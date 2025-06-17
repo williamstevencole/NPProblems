@@ -26,14 +26,25 @@ export default function Knapsack() {
 
   const [includedItems, setIncludedItems] = useState<Item[]>([]);
   const [excludedItems, setExcludedItems] = useState<Item[]>([]);
+ const [modo, setModo] = useState("exacto");
+
 
 const measurePerformance = () => {
-  const { totalValue, selectedItems, notSelectedItems,tiempo } = memoizedKnapsack(capacity, items);
+   if (modo === "exacto") {
+      console.log("Ejecutando algoritmo exacto");
+      const { totalValue, selectedItems, notSelectedItems,tiempo } = memoizedKnapsack(capacity, items); //hacer esto si es exacto
   setTime(tiempo/1000);
   setResult(totalValue);
   setIncludedItems(selectedItems);
   setExcludedItems(notSelectedItems);
+    } else if (modo === "aproximado") {
+      console.log("Ejecutando algoritmo aproximado");
+    
+    } else {
+      alert("Selecciona un modo primero");
+    }
 };
+
 const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!buttonRef.current) return;
 
@@ -195,7 +206,7 @@ const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
  <br></br>
       </div>
      <div style={{ width: "500px", margin: "0 auto" }}>
-      <Radioalgo></Radioalgo>
+      <Radioalgo onChange={setModo}></Radioalgo>
      </div>
      <br></br>
         <div className="container">

@@ -1,20 +1,46 @@
-import "./radio.css"
-export default function Radioalgo(){
-    return (
-        <div className="container">
+import { useState } from "react";
+import "./radio.css";
 
-        <form className="toggle">
+interface RadioalgoProps {
+  onChange?: (value: string) => void;
+}
 
-            <input type="radio" id="choice1" name="choice" value="creative"/>
-            <label htmlFor="choice1">Exacto</label>
+export default function Radioalgo({ onChange }: RadioalgoProps) {
+  const [selected, setSelected] = useState("exacto");
 
-            <input type="radio" id="choice2" name="choice" value="productive"/>
-            <label htmlFor="choice2"> Aproximado</label>
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSelected(value);
+    onChange?.(value);
+  };
 
-            <div id="flap"><span className="content">Algoritmo</span></div>
+  return (
+    <div className="container">
+      <form className="toggle">
+        <input
+          type="radio"
+          id="choice1"
+          name="choice"
+          value="exacto"
+          checked={selected === "exacto"}
+          onChange={handleChange}
+        />
+        <label htmlFor="choice1">Exacto</label>
 
-        </form>
+        <input
+          type="radio"
+          id="choice2"
+          name="choice"
+          value="aproximado"
+          checked={selected === "aproximado"}
+          onChange={handleChange}
+        />
+        <label htmlFor="choice2">Aproximado</label>
 
+        <div id="flap">
+          <span className="content">Algoritmo</span>
+        </div>
+      </form>
     </div>
-    );
+  );
 }
