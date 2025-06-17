@@ -206,6 +206,15 @@ export default function GraphBuilder({
       const jsonBack = await resBacktracking.json();
       const jsonGFG = await resGFG.json();
 
+      if (
+        jsonBack.backtracking.asignacion === null ||
+        jsonGFG.asignacion === null
+      ) {
+        setDialogoActivo(dialogos.resultado.fracaso);
+        setModoSeleccionActiva(false);
+        return;
+      }
+
       // Estados donde guardamos los datos devueltos
       const asignBack = jsonBack.backtracking?.asignacion ?? {};
       const coloresBack = jsonBack.backtracking?.colores_usados ?? 0;
@@ -287,6 +296,10 @@ export default function GraphBuilder({
       setDialogoActivo([{ speaker: "", text: "¿Qué acción vas a hacer?" }]);
       setModoSeleccionActiva(false);
       return;
+    }
+
+    if (dataGFG) {
+      setColoracion(dataGFG.asignacion);
     }
 
     // Caso por defecto: volver al menú

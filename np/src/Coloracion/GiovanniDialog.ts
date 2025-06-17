@@ -131,7 +131,7 @@ const dialogoFracaso: Mensaje[] = [
 export const informacionAlgoritmos: Mensaje[] = [
   {
     speaker: "Giovanni",
-    text: "Recluta, nuestra misión en Sinnoh depende de cómo distribuyamos a nuestros agentes. Existen dos enfoques: fuerza bruta y greedy. Presta atención…",
+    text: "Recluta, nuestra misión en Sinnoh depende de cómo distribuyamos a nuestros agentes. Presta atención…",
   },
   {
     speaker: "Giovanni",

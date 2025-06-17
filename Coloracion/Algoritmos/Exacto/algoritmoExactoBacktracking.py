@@ -1,4 +1,4 @@
-V = 4 
+V = 4 # Number of vertices
 
 def print_solution(color):
     print("Solution Exists: Following are the assigned colors")
@@ -33,7 +33,7 @@ def graph_coloring_util(graph, m, color, v):
     return False
 
 def graph_coloring(graph, m):
-    color = [0] * V
+    color = [0] * V 
 
     # Call graph_coloring_util() for vertex 0
     if not graph_coloring_util(graph, m, color, 0):
@@ -53,7 +53,7 @@ if __name__ == "__main__":
         [1, 0, 1, 0],
     ]
 
-    m = 3
+    m = 3 # Number of colors
 
     # Function call
     graph_coloring(graph, m)
