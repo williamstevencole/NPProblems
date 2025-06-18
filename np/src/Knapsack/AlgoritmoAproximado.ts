@@ -40,5 +40,6 @@ console.log(notSelectedItems);
     selectedItems,
     notSelectedItems,
     tiempo,
+    remainingCapacity
   };
 }

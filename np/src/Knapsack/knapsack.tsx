@@ -23,7 +23,7 @@ export default function Knapsack() {
   const [randomCount, setRandomCount] = useState(0);
   const [capacity, setCapacity] = useState<number>(10);
   const [newItem, setNewItem] = useState<Item>({ peso: 0, valor: 0 });
-
+  const [capacidadfinal, setcapacidad] = useState<number>(0);
   const [Time, setTime] = useState<number>(0);
   const [greedyResult, setResult] = useState<number>(0);
 
@@ -68,20 +68,22 @@ const measurePerformance = () => {
       console.log("Ejecutando algoritmo exacto");
       console.log("Modo actual:", modo);
 
-      const { totalValue, selectedItems, notSelectedItems,tiempo } = exacto(capacity, items); // exacto
+      const { totalValue, selectedItems, notSelectedItems,tiempo,cap } = exacto(capacity, items); // exacto
   setTime(tiempo/1000);
   setResult(totalValue);
   setIncludedItems(selectedItems);
   setExcludedItems(notSelectedItems);
+  setcapacidad(cap);
     } else if (modo === "aproximado") {
       console.log("Ejecutando algoritmo aproximado");
       console.log("Modo actual:", modo);
 
-    const { totalValue, selectedItems, notSelectedItems,tiempo } = aproximado(capacity, items); //ejecutar aproximado
+    const { totalValue, selectedItems, notSelectedItems,tiempo,remainingCapacity } = aproximado(capacity, items); //ejecutar aproximado
   setTime(tiempo/1000);
   setResult(totalValue);
   setIncludedItems(selectedItems);
   setExcludedItems(notSelectedItems);
+  setcapacidad(remainingCapacity);
     } else {
       alert("Selecciona un modo primero");
     }
@@ -297,13 +299,16 @@ const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
       <div className="space-y-2">
         <div>
           <h3 className="text-xl font-bold text-green-600">KnapSack 0/1 Resultados</h3>
-          <p style={{color:"white"}}>Valor máximo: {greedyResult}</p>
-          <p style={{color:"white"}}>Tiempo de ejecución: {Time} s</p>
+          <p style={{color:"white"}}>Valor máximo 💎: {greedyResult}</p>
+          <p style={{color:"white"}}>Tiempo de ejecución ⌛: {Time} s</p>
+          <p style={{color:"white"}}>--------------------------</p>
+          <p style={{color:"white"}}>Objetos calculados (n) 📝: {includedItems.length + excludedItems.length}</p>
           <p style={{color:"white"}}>Cantidad incluida de Objetos: {includedItems.length}</p>
           <p style={{color:"white"}}>Cantidad excluida de Objetos: {excludedItems.length}</p>
-
-          <p style={{color:"white"}}>Capacidad de la mochila: {capacity}</p>
-          <p style={{color:"white"}}>Objetos calculados (n): {includedItems.length + excludedItems.length}</p>
+          <p style={{color:"white"}}>--------------------------</p>
+          <p style={{color:"white"}}>Capacidad incial 🎒: {capacity}</p>
+          <p style={{color:"white"}}>Espacio sobrante: {capacidadfinal}</p>
+          
           
         </div>
       </div>

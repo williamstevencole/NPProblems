@@ -47,5 +47,5 @@ export function exacto(capacity: number, items: Item[]) {
 console.log(totalValue);
 console.log(selectedItems);
 console.log(notSelectedItems);
-  return { totalValue, selectedItems, notSelectedItems, tiempo };
+  return { totalValue, selectedItems, notSelectedItems, tiempo,cap };
 }
