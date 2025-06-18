@@ -1,0 +1,202 @@
+[
+    {
+        "idTest": 1,
+        "fecha": "17/06/2025",
+        "hora": "16:29:17",
+        "tama\u00f1o del arreglo": 10,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 6.8e-05
+    },
+    {
+        "idTest": 2,
+        "fecha": "17/06/2025",
+        "hora": "16:29:17",
+        "tama\u00f1o del arreglo": 25,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 0.00713
+    },
+    {
+        "idTest": 3,
+        "fecha": "17/06/2025",
+        "hora": "16:29:20",
+        "tama\u00f1o del arreglo": 40,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 2.659727
+    },
+    {
+        "idTest": 4,
+        "fecha": "17/06/2025",
+        "hora": "16:29:38",
+        "tama\u00f1o del arreglo": 45,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 18.04277
+    },
+    {
+        "idTest": 5,
+        "fecha": "17/06/2025",
+        "hora": "16:30:13",
+        "tama\u00f1o del arreglo": 47,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 35.797881
+    },
+    {
+        "idTest": 6,
+        "fecha": "17/06/2025",
+        "hora": "16:30:52",
+        "tama\u00f1o del arreglo": 10,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 0.000117
+    },
+    {
+        "idTest": 7,
+        "fecha": "17/06/2025",
+        "hora": "16:30:52",
+        "tama\u00f1o del arreglo": 25,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 0.016963
+    },
+    {
+        "idTest": 8,
+        "fecha": "17/06/2025",
+        "hora": "16:30:55",
+        "tama\u00f1o del arreglo": 40,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 2.842935
+    },
+    {
+        "idTest": 9,
+        "fecha": "17/06/2025",
+        "hora": "16:31:12",
+        "tama\u00f1o del arreglo": 45,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 16.807787
+    },
+    {
+        "idTest": 10,
+        "fecha": "17/06/2025",
+        "hora": "16:31:49",
+        "tama\u00f1o del arreglo": 47,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 37.886938
+    },
+    {
+        "idTest": 11,
+        "fecha": "17/06/2025",
+        "hora": "16:31:59",
+        "tama\u00f1o del arreglo": 10,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 4.1e-05
+    },
+    {
+        "idTest": 12,
+        "fecha": "17/06/2025",
+        "hora": "16:31:59",
+        "tama\u00f1o del arreglo": 25,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 0.005691
+    },
+    {
+        "idTest": 13,
+        "fecha": "17/06/2025",
+        "hora": "16:32:01",
+        "tama\u00f1o del arreglo": 40,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 2.07669
+    },
+    {
+        "idTest": 14,
+        "fecha": "17/06/2025",
+        "hora": "16:32:14",
+        "tama\u00f1o del arreglo": 45,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 13.134591
+    },
+    {
+        "idTest": 15,
+        "fecha": "17/06/2025",
+        "hora": "16:32:43",
+        "tama\u00f1o del arreglo": 47,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 28.924426
+    },
+    {
+        "idTest": 16,
+        "fecha": "17/06/2025",
+        "hora": "16:33:50",
+        "tama\u00f1o del arreglo": 10,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 8.6e-05
+    },
+    {
+        "idTest": 17,
+        "fecha": "17/06/2025",
+        "hora": "16:33:50",
+        "tama\u00f1o del arreglo": 25,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 0.006438
+    },
+    {
+        "idTest": 18,
+        "fecha": "17/06/2025",
+        "hora": "16:33:52",
+        "tama\u00f1o del arreglo": 40,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 2.027177
+    },
+    {
+        "idTest": 19,
+        "fecha": "17/06/2025",
+        "hora": "16:34:05",
+        "tama\u00f1o del arreglo": 45,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 13.610056
+    },
+    {
+        "idTest": 20,
+        "fecha": "17/06/2025",
+        "hora": "16:34:34",
+        "tama\u00f1o del arreglo": 47,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 28.395116
+    },
+    {
+        "idTest": 21,
+        "fecha": "17/06/2025",
+        "hora": "16:35:09",
+        "tama\u00f1o del arreglo": 10,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 4.6e-05
+    },
+    {
+        "idTest": 22,
+        "fecha": "17/06/2025",
+        "hora": "16:35:09",
+        "tama\u00f1o del arreglo": 25,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 0.003993
+    },
+    {
+        "idTest": 23,
+        "fecha": "17/06/2025",
+        "hora": "16:35:11",
+        "tama\u00f1o del arreglo": 40,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 2.008876
+    },
+    {
+        "idTest": 24,
+        "fecha": "17/06/2025",
+        "hora": "16:35:25",
+        "tama\u00f1o del arreglo": 45,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 13.547498
+    },
+    {
+        "idTest": 25,
+        "fecha": "17/06/2025",
+        "hora": "16:35:54",
+        "tama\u00f1o del arreglo": 47,
+        "target": 100,
+        "tiempo tomado (en ejecucion)": 28.62828
+    }
+]
