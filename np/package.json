@@ -14,9 +14,9 @@
     "@iconify/react": "^6.0.0",
     "@tailwindcss/vite": "^4.1.7",
     "antd": "^5.25.4",
+    "file-saver": "^2.0.5",
     "framer-motion": "^12.18.1",
     "lightweight-charts": "^5.0.7",
-    "antd": "^5.25.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-magic-motion": "^1.1.2",
@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^22.15.21",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",

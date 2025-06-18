@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { MagicMotion } from "react-magic-motion";
 interface Item {
   peso: number;

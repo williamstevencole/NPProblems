@@ -1,5 +1,5 @@
 import { useState,useRef } from 'react';
-import { memoizedKnapsack } from './AlgoritmoKnapsack';
+import { exacto } from './AlgoritmoKnapsack';
 import { InputNumber, message, Row,Col } from "antd";
 import IncludedItemsTable from './tablaAll';
 import ExcludedItemsTable from './tablaFuera';
@@ -9,6 +9,9 @@ import "./but.css"
 import "./bu.css"
 import Radioalgo from './radio';
 import titulo from "./titulo.png"
+import { aproximado } from './AlgoritmoAproximado';
+
+import { saveAs } from "file-saver";
 interface Item {
   peso: number;
   valor: number;
@@ -29,17 +32,56 @@ export default function Knapsack() {
  const [modo, setModo] = useState("exacto");
 
 
+  const handleLoadFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result;
+      if (typeof result === "string") {
+        try {
+          const parsed = JSON.parse(result);
+          if (Array.isArray(parsed) && parsed.every(i => "peso" in i && "valor" in i)) {
+            setItems(parsed);
+          } else {
+            alert("Formato inválido de ítems");
+          }
+        } catch (err) {
+          alert("Error al leer el archivo");
+        }
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleSaveFile = () => {
+    const blob = new Blob([JSON.stringify(items, null, 2)], {
+      type: "application/json",
+    });
+    saveAs(blob, "items.json");
+  };
+
+
 const measurePerformance = () => {
    if (modo === "exacto") {
       console.log("Ejecutando algoritmo exacto");
-      const { totalValue, selectedItems, notSelectedItems,tiempo } = memoizedKnapsack(capacity, items); //hacer esto si es exacto
+      console.log("Modo actual:", modo);
+
+      const { totalValue, selectedItems, notSelectedItems,tiempo } = exacto(capacity, items); // exacto
   setTime(tiempo/1000);
   setResult(totalValue);
   setIncludedItems(selectedItems);
   setExcludedItems(notSelectedItems);
     } else if (modo === "aproximado") {
       console.log("Ejecutando algoritmo aproximado");
-    
+      console.log("Modo actual:", modo);
+
+    const { totalValue, selectedItems, notSelectedItems,tiempo } = aproximado(capacity, items); //ejecutar aproximado
+  setTime(tiempo/1000);
+  setResult(totalValue);
+  setIncludedItems(selectedItems);
+  setExcludedItems(notSelectedItems);
     } else {
       alert("Selecciona un modo primero");
     }
@@ -200,8 +242,26 @@ const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
 </Col>
 
 </Row>
+      <br></br>
+      <br></br>
       <div>
-      
+      <div className='flex justify-center space-x-4 mt-4'>
+        
+      <input color='white' style={{marginLeft:"0"}} type='file' accept=".json"
+       onChange={handleLoadFile}></input>
+      <button
+          onClick={handleSaveFile}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#3e98ed",
+            color: "white",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          💾 Guardar Objetos
+        </button>
+      </div>
   <AllItems items={items} removeItem={removeItem} />
  <br></br>
       </div>
@@ -236,10 +296,15 @@ const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
 </div>
       <div className="space-y-2">
         <div>
-          <h3 className="text-xl font-bold text-green-600">KnapSack (Memorización)</h3>
+          <h3 className="text-xl font-bold text-green-600">KnapSack 0/1 Resultados</h3>
           <p style={{color:"white"}}>Valor máximo: {greedyResult}</p>
           <p style={{color:"white"}}>Tiempo de ejecución: {Time} s</p>
-            
+          <p style={{color:"white"}}>Cantidad incluida de Objetos: {includedItems.length}</p>
+          <p style={{color:"white"}}>Cantidad excluida de Objetos: {excludedItems.length}</p>
+
+          <p style={{color:"white"}}>Capacidad de la mochila: {capacity}</p>
+          <p style={{color:"white"}}>Objetos calculados (n): {includedItems.length + excludedItems.length}</p>
+          
         </div>
       </div>
     </div>
