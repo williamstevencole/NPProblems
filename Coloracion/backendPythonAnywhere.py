@@ -17,7 +17,7 @@ def coloracion_backtracking_gfg():
         return jsonify({"error": "Falta la matriz de adyacencia"}), 400
 
     V = len(graph)
-    color = [0] * V
+    color = [0] * V # Inicializar colores de los vértices a 0
     llamadas = 0
     backtracks = 0
 
@@ -53,7 +53,7 @@ def coloracion_backtracking_gfg():
         "backtracking": {
             "asignacion": asignacion if exito else None,
             "colores_usados": max(asignacion.values()) if exito else 0,
-            "tiempo": (fin - inicio) * 1000,
+            "tiempo": (fin - inicio) * 1000, ## Convertir a milisegundos
             "llamadas": llamadas,
             "backtracks": backtracks
         }
@@ -108,9 +108,9 @@ def coloracion_backtracking_endpoint():
         return False
 
     asignacion: dict[str , int] = {}
-    inicio = time.perf_counter()
+    inicio = time.time()
     exito = backtrack(0, asignacion)
-    fin = time.perf_counter()
+    fin = time.time()
 
     return jsonify({
         "backtracking": {
