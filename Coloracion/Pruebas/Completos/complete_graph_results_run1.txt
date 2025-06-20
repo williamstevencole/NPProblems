@@ -1,0 +1,59 @@
+El grafo generado contiene 10 nodos, en donde cada nodo tiene 9 conexiones, formando una cantidad de 90 conexiones.
+resultado aproximado -> {"colores_usados": 10, "tiempo": 0.0002448558807373047, "llamadas": 11, "backtracks": 0}
+resultado exacto   -> {"colores_usados": 10, "tiempo": 2.09808349609375e-05, "llamadas": 11, "backtracks": 0}
+
+El grafo generado contiene 50 nodos, en donde cada nodo tiene 49 conexiones, formando una cantidad de 2450 conexiones.
+resultado aproximado -> {"colores_usados": 50, "tiempo": 0.0021779537200927734, "llamadas": 51, "backtracks": 0}
+resultado exacto   -> {"colores_usados": 50, "tiempo": 0.0011148452758789062, "llamadas": 51, "backtracks": 0}
+
+El grafo generado contiene 100 nodos, en donde cada nodo tiene 99 conexiones, formando una cantidad de 9900 conexiones.
+resultado aproximado -> {"colores_usados": 100, "tiempo": 0.010456085205078125, "llamadas": 101, "backtracks": 0}
+resultado exacto   -> {"colores_usados": 100, "tiempo": 0.007037162780761719, "llamadas": 101, "backtracks": 0}
+
+El grafo generado contiene 250 nodos, en donde cada nodo tiene 249 conexiones, formando una cantidad de 62250 conexiones.
+resultado aproximado -> {"colores_usados": 250, "tiempo": 0.1240377426147461, "llamadas": 251, "backtracks": 0}
+resultado exacto   -> {"colores_usados": 250, "tiempo": 0.09405207633972168, "llamadas": 251, "backtracks": 0}
+
+El grafo generado contiene 500 nodos, en donde cada nodo tiene 499 conexiones, formando una cantidad de 249500 conexiones.
+resultado aproximado -> {"colores_usados": 500, "tiempo": 0.9635300636291504, "llamadas": 501, "backtracks": 0}
+resultado exacto   -> {"colores_usados": 500, "tiempo": 0.7610762119293213, "llamadas": 501, "backtracks": 0}
+
+El grafo generado contiene 750 nodos, en donde cada nodo tiene 749 conexiones, formando una cantidad de 561750 conexiones.
+resultado aproximado -> {"colores_usados": 750, "tiempo": 3.3430960178375244, "llamadas": 751, "backtracks": 0}
+resultado exacto   -> {"colores_usados": 750, "tiempo": 2.5738518238067627, "llamadas": 751, "backtracks": 0}
+
+El grafo generado contiene 900 nodos, en donde cada nodo tiene 899 conexiones, formando una cantidad de 809100 conexiones.
+resultado aproximado -> {"colores_usados": 900, "tiempo": 5.638682842254639, "llamadas": 901, "backtracks": 0}
+resultado exacto   -> {"colores_usados": 900, "tiempo": 4.470790863037109, "llamadas": 901, "backtracks": 0}
+
+El grafo generado contiene 950 nodos, en donde cada nodo tiene 949 conexiones, formando una cantidad de 901550 conexiones.
+resultado aproximado -> {"colores_usados": 950, "tiempo": 6.747114896774292, "llamadas": 951, "backtracks": 0}
+resultado exacto   -> {"colores_usados": 950, "tiempo": 5.332027912139893, "llamadas": 951, "backtracks": 0}
+
+El grafo generado contiene 980 nodos, en donde cada nodo tiene 979 conexiones, formando una cantidad de 959420 conexiones.
+resultado aproximado -> {"colores_usados": 980, "tiempo": 7.234215974807739, "llamadas": 981, "backtracks": 0}
+resultado exacto   -> {"colores_usados": 980, "tiempo": 5.8584229946136475, "llamadas": 981, "backtracks": 0}
+
+El grafo generado contiene 981 nodos, en donde cada nodo tiene 980 conexiones, formando una cantidad de 961380 conexiones.
+resultado aproximado -> {"colores_usados": 981, "tiempo": 7.285245895385742, "llamadas": 982, "backtracks": 0}
+resultado exacto   -> {"colores_usados": 981, "tiempo": 5.8355491161346436, "llamadas": 982, "backtracks": 0}
+
+El grafo generado contiene 982 nodos, en donde cada nodo tiene 981 conexiones, formando una cantidad de 963342 conexiones.
+resultado aproximado -> {"colores_usados": null, "tiempo": null, "llamadas": null, "backtracks": null}
+resultado exacto   -> {"colores_usados": 982, "tiempo": 5.831538200378418, "llamadas": 983, "backtracks": 0}
+
+El grafo generado contiene 983 nodos, en donde cada nodo tiene 982 conexiones, formando una cantidad de 965306 conexiones.
+resultado aproximado -> {"colores_usados": null, "tiempo": null, "llamadas": null, "backtracks": null}
+resultado exacto   -> {"colores_usados": null, "tiempo": null, "llamadas": null, "backtracks": null}
+
+El grafo generado contiene 985 nodos, en donde cada nodo tiene 984 conexiones, formando una cantidad de 969240 conexiones.
+resultado aproximado -> {"colores_usados": null, "tiempo": null, "llamadas": null, "backtracks": null}
+resultado exacto   -> {"colores_usados": null, "tiempo": null, "llamadas": null, "backtracks": null}
+
+El grafo generado contiene 990 nodos, en donde cada nodo tiene 989 conexiones, formando una cantidad de 979110 conexiones.
+resultado aproximado -> {"colores_usados": null, "tiempo": null, "llamadas": null, "backtracks": null}
+resultado exacto   -> {"colores_usados": null, "tiempo": null, "llamadas": null, "backtracks": null}
+
+El grafo generado contiene 1000 nodos, en donde cada nodo tiene 999 conexiones, formando una cantidad de 999000 conexiones.
+resultado aproximado -> {"colores_usados": null, "tiempo": null, "llamadas": null, "backtracks": null}
+resultado exacto   -> {"colores_usados": null, "tiempo": null, "llamadas": null, "backtracks": null}

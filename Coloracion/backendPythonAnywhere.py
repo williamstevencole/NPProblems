@@ -53,7 +53,7 @@ def coloracion_backtracking_gfg():
         "backtracking": {
             "asignacion": asignacion if exito else None,
             "colores_usados": max(asignacion.values()) if exito else 0,
-            "tiempo": (fin - inicio) * 1000, ## Convertir a milisegundos
+            "tiempo": (fin - inicio), #
             "llamadas": llamadas,
             "backtracks": backtracks
         }
@@ -116,7 +116,7 @@ def coloracion_backtracking_endpoint():
         "backtracking": {
             "asignacion": asignacion if exito else None,
             "colores_usados": max(asignacion.values()) if exito else 0,
-            "tiempo": (fin - inicio) * 1000,
+            "tiempo": (fin - inicio), # tiempo en segundos
             "llamadas": llamadas,
             "backtracks": backtracks
         }
