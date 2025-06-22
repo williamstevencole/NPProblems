@@ -95,7 +95,6 @@ def subset_sum_meet_in_the_middle_iterative(arr, target_sum):
         return None
     
 # ---------------------------------------------------
-
 def run_fixed_tests():
     """
     Ejecuta el algoritmo Meet-in-the-Middle con conjuntos de tamaños fijos
@@ -103,54 +102,40 @@ def run_fixed_tests():
     """
     # ESTE REVIENTA CUANTO ES > 47
     fixed_sizes = [10, 25, 40, 45, 47]
-    
     try:
         target_value = int(input("Ingrese la suma objetivo (target) para todas las pruebas: "))
         if target_value < 0:
             print("El target no puede ser un número negativo.")
             return
-
     except ValueError:
         print("Entrada inválida. Por favor, ingrese un número entero.")
         return
-
     json_file_name = "resultados.json"
     results_data = []
-
     if os.path.exists(json_file_name):
         with open(json_file_name, 'r') as f:
             try:
                 results_data = json.load(f)
             except json.JSONDecodeError:
                 results_data = []
-    
     print("\n--- Ejecutando pruebas con conjuntos de tamaños fijos ---")
-
     for size in fixed_sizes:
         arr = [random.randint(1, 50) for _ in range(size)] # Generamos números aleatorios entre 1 y 50
         print(f"\nProbando con un conjunto de {size} elementos...")
-        # print(f"Conjunto generado: {arr}") 
         print(f"Buscando subconjunto que sume: {target_value}")
-
         start_time = time.perf_counter()
         result = subset_sum_meet_in_the_middle_iterative(arr, target_value)
         end_time = time.perf_counter()
-        
         time_taken = end_time - start_time
-
         if result is not None:
             print(f"¡Éxito! Se encontró un subconjunto que suma {target_value}.")
-            # print(f"Subconjunto: {result}") 
         else:
             print(f"No se encontró ningún subconjunto que sume {target_value}.")
-        
         print(f"Tiempo tomado (en ejecución): {time_taken:.6f} segundos")
-
         # Asignar idTest
         new_id_test = 1
         if results_data:
             new_id_test = max(item.get('idTest', 0) for item in results_data) + 1
-
         current_datetime = datetime.now()
         new_entry = {
             "idTest": new_id_test,
@@ -160,9 +145,7 @@ def run_fixed_tests():
             "target": target_value,
             "tiempo tomado (en ejecucion)": round(time_taken, 6)
         }
-        
         results_data.append(new_entry)
-
     with open(json_file_name, 'w') as f:
         json.dump(results_data, f, indent=4)
     print(f"\nTodas las pruebas se completaron. Resultados guardados en '{json_file_name}'.")
