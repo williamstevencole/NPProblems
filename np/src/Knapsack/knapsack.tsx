@@ -21,14 +21,14 @@ export default function Knapsack() {
   const [items, setItems] = useState<Item[]>([]);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [randomCount, setRandomCount] = useState(0);
-  const [capacity, setCapacity] = useState<number>(10);
-  const [newItem, setNewItem] = useState<Item>({ peso: 0, valor: 0 });
+  const [Capacidad, setCapacidad] = useState<number>(10);
+  const [nuevoItem, setnuevoItem] = useState<Item>({ peso: 0, valor: 0 });
   const [capacidadfinal, setcapacidad] = useState<number>(0);
-  const [Time, setTime] = useState<number>(0);
-  const [greedyResult, setResult] = useState<number>(0);
+  const [tiempo, settiempo] = useState<number>(0);
+  const [AproximadoResultado, setResultado] = useState<number>(0);
 
-  const [includedItems, setIncludedItems] = useState<Item[]>([]);
-  const [excludedItems, setExcludedItems] = useState<Item[]>([]);
+  const [Incluidos, setIncluidos] = useState<Item[]>([]);
+  const [NOseleccionados, setExcluidos] = useState<Item[]>([]);
  const [modo, setModo] = useState("exacto");
 
 
@@ -68,22 +68,22 @@ const measurePerformance = () => {
       console.log("Ejecutando algoritmo exacto");
       console.log("Modo actual:", modo);
 
-      const { totalValue, selectedItems, notSelectedItems,tiempo,cap } = exacto(capacity, items); // exacto
-  setTime(tiempo/1000);
-  setResult(totalValue);
-  setIncludedItems(selectedItems);
-  setExcludedItems(notSelectedItems);
-  setcapacidad(cap);
+      const { ValorTotal, seleccionados, NOseleccionados,tiempo,CapacidadRestante } = exacto(Capacidad, items); // exacto
+  settiempo(tiempo);
+  setResultado(ValorTotal);
+  setIncluidos(seleccionados);
+  setExcluidos(NOseleccionados);
+  setcapacidad(CapacidadRestante);
     } else if (modo === "aproximado") {
       console.log("Ejecutando algoritmo aproximado");
       console.log("Modo actual:", modo);
 
-    const { totalValue, selectedItems, notSelectedItems,tiempo,remainingCapacity } = aproximado(capacity, items); //ejecutar aproximado
-  setTime(tiempo/1000);
-  setResult(totalValue);
-  setIncludedItems(selectedItems);
-  setExcludedItems(notSelectedItems);
-  setcapacidad(remainingCapacity);
+    const { ValorTotal, seleccionados, NOseleccionados,tiempo,CapacidadRestante } = aproximado(Capacidad, items); //ejecutar aproximado
+  settiempo(tiempo);
+  setResultado(ValorTotal);
+  setIncluidos(seleccionados);
+  setExcluidos(NOseleccionados);
+  setcapacidad(CapacidadRestante);
     } else {
       alert("Selecciona un modo primero");
     }
@@ -118,9 +118,9 @@ const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
   };
 
   const addItem = () => {
-    if (newItem.peso > 0 && newItem.valor > 0) {
-      setItems([...items, newItem]);
-      setNewItem({ peso: 0, valor: 0 });
+    if (nuevoItem.peso > 0 && nuevoItem.valor > 0) {
+      setItems([...items, nuevoItem]);
+      setnuevoItem({ peso: 0, valor: 0 });
     }
   };
 
@@ -161,8 +161,8 @@ const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
                 color:"rgb(250, 250, 250)"
                 }}
           type="number"
-          value={capacity}
-          onChange={(e) => setCapacity(parseInt(e.target.value))}
+          value={Capacidad}
+          onChange={(e) => setCapacidad(parseInt(e.target.value))}
           className="border rounded p-2"
         />
       </div>
@@ -183,8 +183,8 @@ const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
                 borderRadius: "8px",
                 color:"rgb(250, 250, 250)"
                 }}
-          value={newItem.peso}
-          onChange={(e) => setNewItem({ ...newItem, peso: parseFloat(e.target.value) })}
+          value={nuevoItem.peso}
+          onChange={(e) => setnuevoItem({ ...nuevoItem, peso: parseFloat(e.target.value) })}
           className="border rounded p-2 mr-2"
         />
         </div>
@@ -198,8 +198,8 @@ const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
                 borderRadius: "8px",
                 color:"rgb(250, 250, 250)"
                 }}
-          value={newItem.valor}
-          onChange={(e) => setNewItem({ ...newItem, valor: parseFloat(e.target.value) })}
+          value={nuevoItem.valor}
+          onChange={(e) => setnuevoItem({ ...nuevoItem, valor: parseFloat(e.target.value) })}
           className="border rounded p-2 mr-2"
         />
         </div>
@@ -285,13 +285,13 @@ const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
     <Col>
       <div className="text-center">
         <h2 className="font-bold text-lg mb-2" style={{color:"rgb(139, 251, 35)"}}>Ítems dentro de la mochila</h2>
-        <IncludedItemsTable data={includedItems} />
+        <IncludedItemsTable data={Incluidos} />
       </div>
     </Col>
     <Col>
       <div className="text-center">
         <h2 className="font-bold text-lg mb-2" style={{color:"#f2ef24"}}>Ítems fuera de la mochila</h2>
-        <ExcludedItemsTable data={excludedItems} />
+        <ExcludedItemsTable data={NOseleccionados} />
       </div>
     </Col>
   </Row>
@@ -299,14 +299,14 @@ const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
       <div className="space-y-2">
         <div>
           <h3 className="text-xl font-bold text-green-600">KnapSack 0/1 Resultados</h3>
-          <p style={{color:"white"}}>Valor máximo 💎: {greedyResult}</p>
-          <p style={{color:"white"}}>Tiempo de ejecución ⌛: {Time} s</p>
+          <p style={{color:"white"}}>Valor máximo 💎: {AproximadoResultado}</p>
+          <p style={{color:"white"}}>Tiempo de ejecución ⌛: {tiempo} s</p>
           <p style={{color:"white"}}>--------------------------</p>
-          <p style={{color:"white"}}>Objetos calculados (n) 📝: {includedItems.length + excludedItems.length}</p>
-          <p style={{color:"white"}}>Cantidad incluida de Objetos: {includedItems.length}</p>
-          <p style={{color:"white"}}>Cantidad excluida de Objetos: {excludedItems.length}</p>
+          <p style={{color:"white"}}>Objetos calculados (n) 📝: {Incluidos.length + NOseleccionados.length}</p>
+          <p style={{color:"white"}}>Cantidad incluida de Objetos: {Incluidos.length}</p>
+          <p style={{color:"white"}}>Cantidad excluida de Objetos: {NOseleccionados.length}</p>
           <p style={{color:"white"}}>--------------------------</p>
-          <p style={{color:"white"}}>Capacidad incial 🎒: {capacity}</p>
+          <p style={{color:"white"}}>Capacidad incial 🎒: {Capacidad}</p>
           <p style={{color:"white"}}>Espacio sobrante: {capacidadfinal}</p>
           
           

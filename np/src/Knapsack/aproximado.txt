@@ -1,0 +1,29 @@
+funcion Knapsack_aproximado (integer capacidad, arr objetos[]){
+
+    merge_sort (objetos);
+
+    for (int i = 0; i < objetos.length && Capacidad > 0; i++) {
+    const item = objetos[i];
+    if (item.peso <= Capacidad) {
+
+      Capacidad -= item.peso;
+      ValorTotal += item.valor;
+
+    }
+  }
+}
+
+
+void merge_sort(arr A) {
+    i=A.length;
+    if i<= 0
+    return falso
+    if i<=1
+    return A 
+
+    mitad1=merge.sort(A[0,i/2])
+    mitad2=merge_sort(A[i/2 +1,i])
+    lista=mezclar (mitad1,mitad2)
+
+    return lista
+}
