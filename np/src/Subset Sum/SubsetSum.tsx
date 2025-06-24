@@ -31,7 +31,7 @@ const sampleTransactions: Transaction[] = [
   { id: 17, amount: 1300, date: "2024-05-31", description: "Impuesto de Propiedad" },
   { id: 18, amount: 450, date: "2024-06-01", description: "Reembolso Empleado" },
   { id: 19, amount: 3100, date: "2024-06-02", description: "Crédito Bancario" },
-  { id: 20, amount: 850, date: "2024-06-03", description: "Servicios de Limpieza" },
+  /* { id: 20, amount: 850, date: "2024-06-03", description: "Servicios de Limpieza" },
   { id: 21, amount: 1900, date: "2024-06-04", description: "Comisión por Ventas" },
   { id: 22, amount: 650, date: "2024-06-05", description: "Licencia de Software" },
   { id: 23, amount: 2400, date: "2024-06-06", description: "Inversión en Crypto Perrin Coin" },
@@ -61,7 +61,7 @@ const sampleTransactions: Transaction[] = [
   { id: 47, amount: 1250, date: "2024-06-30", description: "Servicio de Internet TIGO" },
   { id: 48, amount: 2500, date: "2024-07-01", description: "Cuota de Préstamo" },
   { id: 49, amount: 600, date: "2024-07-02", description: "Compra de Café Oro" },
-  { id: 50, amount: 1950, date: "2024-07-03", description: "Remuneración por Logro" }
+  { id: 50, amount: 1950, date: "2024-07-03", description: "Remuneración por Logro" } */
 ];
 
 const transactionsById = new Map<number, Transaction>();
@@ -72,9 +72,34 @@ const formatLempiras = (amount: number): string => {
   return `L.${amount.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
-// Función para generar sumas y subconjuntos
-// (retorna UNA combinación por suma, la más corta)
-function generateSumsAndSubsets(
+// **ALGORITMO EXACTO (Basado en subset_sum_meet_in_the_middle_iterative de subsetSum.py)**
+function generateSumsAndSubsetsExact(
+  halfArray: Transaction[]
+): Map<number, number[]> {
+  const allSumsAndSubsets: [number, number[]][] = [[0, []]]; // (suma, lista_de_ids)
+
+  for (const element of halfArray) {
+    const newAdditions: [number, number[]][] = [];
+    for (const [currentSum, currentSubsetIds] of allSumsAndSubsets) {
+      const newSum = currentSum + element.amount;
+      const newSubsetIds = [...currentSubsetIds, element.id];
+      newAdditions.push([newSum, newSubsetIds]);
+    }
+    allSumsAndSubsets.push(...newAdditions); // Añadir las nuevas combinaciones
+  }
+
+  // Convertir a un mapa, priorizando el subconjunto más corto si hay múltiples para la misma suma
+  const sumsMap = new Map<number, number[]>();
+  for (const [s, sub] of allSumsAndSubsets) {
+    if (!sumsMap.has(s) || sub.length < (sumsMap.get(s)!).length) {
+      sumsMap.set(s, sub);
+    }
+  }
+  return sumsMap;
+}
+
+// **ALGORITMO APROXIMADO (Basado en subsetSumAproxWithHash de subsetSumAprox.py)**
+function generateSumsAndSubsetsApprox(
   halfArray: Transaction[]
 ): Map<number, number[]> {
   const sumsMap = new Map<number, number[]>();
@@ -95,6 +120,7 @@ function generateSumsAndSubsets(
   return sumsMap;
 }
 
+
 // Función auxiliar para comparar subconjuntos (orden-agnóstico)
 function areSubsetsEqual(subset1: number[], subset2: number[]): boolean {
   if (subset1.length !== subset2.length) return false;
@@ -108,24 +134,37 @@ const SubsetSum: React.FC = () => {
   const [transactions] = useState<Transaction[]>(sampleTransactions);
   const [targetAmount, setTargetAmount] = useState<number | ''>('');
   const [highlightedTransactions, setHighlightedTransactions] = useState<number[]>([]);
-  const [reconciliationStatus, setReconciliationStatus] = useState<'idle' | 'success' | 'failure' | 'calculating' | 'noMoreSubsets'>('idle');
+  const [reconciliationStatus, setReconciliationStatus] = useState<'idle' | 'success' | 'failure' | 'calculating' | 'noMoreSubsets' | 'approximateSuccess'>('idle');
   const [currentlyProcessingId, setCurrentlyProcessingId] = useState<number | null>(null);
   const [foundSubsetsHistory, setFoundSubsetsHistory] = useState<Set<string>>(new Set());
   const [displayedSubsets, setDisplayedSubsets] = useState<number[][]>([]);
 
   const navigate = useNavigate();
 
-  // Memoizar los mapas de sumas para evitar recálculos innecesarios
-  const { leftSumsMap, rightSumsMap } = useMemo(() => {
+  // Memoizar los mapas de sumas para el algoritmo Exacto
+  const { leftSumsMapExact, rightSumsMapExact } = useMemo(() => {
     const mid = Math.floor(transactions.length / 2);
     const leftHalf = transactions.slice(0, mid);
     const rightHalf = transactions.slice(mid);
 
-    const left = generateSumsAndSubsets(leftHalf);
-    const right = generateSumsAndSubsets(rightHalf);
+    const left = generateSumsAndSubsetsExact(leftHalf);
+    const right = generateSumsAndSubsetsExact(rightHalf);
     
-    return { leftSumsMap: left, rightSumsMap: right };
-  }, [transactions]); 
+    return { leftSumsMapExact: left, rightSumsMapExact: right };
+  }, [transactions]);
+
+  // Memoizar los mapas de sumas para el algoritmo Aproximado
+  const { leftSumsMapApprox, rightSumsMapApprox } = useMemo(() => {
+    const mid = Math.floor(transactions.length / 2);
+    const leftHalf = transactions.slice(0, mid);
+    const rightHalf = transactions.slice(mid);
+
+    const left = generateSumsAndSubsetsApprox(leftHalf);
+    const right = generateSumsAndSubsetsApprox(rightHalf);
+    
+    return { leftSumsMapApprox: left, rightSumsMapApprox: right };
+  }, [transactions]);
+
 
   // Al cambiar el targetAmount, reiniciar estados relevantes
   const handleTargetAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,6 +184,7 @@ const SubsetSum: React.FC = () => {
     }, 0);
   }, [highlightedTransactions]);
 
+  // Función para encontrar coincidencia EXACTA (Implementación de Meet-in-the-Middle)
   const findExactMatch = async () => {
     if (targetAmount === '' || typeof targetAmount !== 'number' || targetAmount <= 0) { 
       setReconciliationStatus('idle');
@@ -157,7 +197,7 @@ const SubsetSum: React.FC = () => {
     setCurrentlyProcessingId(null); 
     const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
     const animationDelay = 100;
-    // Simular recorrido inicial de transacciones
+    // Simular recorrido inicial de transacciones para animación
     for (const transaction of transactions) {
       setCurrentlyProcessingId(transaction.id); 
       await delay(animationDelay); 
@@ -165,18 +205,17 @@ const SubsetSum: React.FC = () => {
     setCurrentlyProcessingId(null);
     let foundNewSubsetIds: number[] | null = null;
     let anySubsetFoundForTarget = false; 
-    // Iterar sobre leftSumsMap para encontrar un subconjunto
-    for (const [lSum, lSubsetIds] of leftSumsMap.entries()) {
+
+    for (const [lSum, lSubsetIds] of leftSumsMapExact.entries()) { // Usar leftSumsMapExact
       const requiredRSum = targetAmount - lSum;
-      if (rightSumsMap.has(requiredRSum)) {
-        const rSubsetIds = rightSumsMap.get(requiredRSum)!;
+      if (rightSumsMapExact.has(requiredRSum)) { // Usar rightSumsMapExact
+        const rSubsetIds = rightSumsMapExact.get(requiredRSum)!;
         const combinedSubset = [...lSubsetIds, ...rSubsetIds];
         const sortedCombinedSubset = [...combinedSubset].sort((a, b) => a - b);
         const subsetKey = JSON.stringify(sortedCombinedSubset);
 
         anySubsetFoundForTarget = true; 
 
-        // Si este subconjunto no ha sido presentado antes, se toma
         if (!foundSubsetsHistory.has(subsetKey)) {
           foundNewSubsetIds = combinedSubset;
           break; 
@@ -203,17 +242,83 @@ const SubsetSum: React.FC = () => {
       });
 
     } else {
-        // No se encontró ningún nuevo subconjunto para el target actual
         if (anySubsetFoundForTarget && foundSubsetsHistory.size > 0) {
-            // Se encontraron subconjuntos antes, pero ahora no hay nuevos para este target
             setReconciliationStatus('noMoreSubsets');
         } else {
-            // Nunca se encontró ningún subconjunto para este target
             setReconciliationStatus('failure');
         }
         setHighlightedTransactions([]); 
     }
   };
+
+  // Función para encontrar coincidencia APROXIMADA (Implementación de Meet-in-the-Middle "aproximado")
+  const findApproximateMatch = async () => {
+    if (targetAmount === '' || typeof targetAmount !== 'number' || targetAmount <= 0) {
+      setReconciliationStatus('idle');
+      setHighlightedTransactions([]);
+      setCurrentlyProcessingId(null);
+      return;
+    }
+    setReconciliationStatus('calculating');
+    setHighlightedTransactions([]);
+    setCurrentlyProcessingId(null);
+    const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+    const animationDelay = 100;
+
+    // Simular procesamiento
+    for (const transaction of transactions) {
+      setCurrentlyProcessingId(transaction.id);
+      await delay(animationDelay / 2); // Un poco más rápido para la aproximación visual
+    }
+    setCurrentlyProcessingId(null);
+
+    let foundNewSubsetIds: number[] | null = null;
+    let anySubsetFoundForTarget = false; 
+
+    // Usar los mapas generados por generateSumsAndSubsetsApprox
+    for (const [lSum, lSubsetIds] of leftSumsMapApprox.entries()) {
+      const requiredRSum = targetAmount - lSum;
+      if (rightSumsMapApprox.has(requiredRSum)) {
+        const rSubsetIds = rightSumsMapApprox.get(requiredRSum)!;
+        const combinedSubset = [...lSubsetIds, ...rSubsetIds];
+        const sortedCombinedSubset = [...combinedSubset].sort((a, b) => a - b);
+        const subsetKey = JSON.stringify(sortedCombinedSubset);
+
+        anySubsetFoundForTarget = true; 
+
+        if (!foundSubsetsHistory.has(subsetKey)) {
+          foundNewSubsetIds = combinedSubset;
+          break; 
+        }
+      }
+    }
+
+    if (foundNewSubsetIds) {
+        setHighlightedTransactions(foundNewSubsetIds);
+        setReconciliationStatus('approximateSuccess'); 
+        setFoundSubsetsHistory(prev => {
+            const newSet = new Set(prev);
+            const sortedSubset = [...foundNewSubsetIds!].sort((a, b) => a - b);
+            newSet.add(JSON.stringify(sortedSubset));
+            return newSet;
+        });
+        setDisplayedSubsets(prev => {
+            const isAlreadyDisplayed = prev.some(existing => areSubsetsEqual(existing, foundNewSubsetIds!));
+            if (!isAlreadyDisplayed) {
+                return [...prev, foundNewSubsetIds!];
+            }
+            return prev;
+        });
+    } else {
+        if (anySubsetFoundForTarget && foundSubsetsHistory.size > 0) {
+            setReconciliationStatus('noMoreSubsets');
+        } else {
+            setReconciliationStatus('failure');
+        }
+        setHighlightedTransactions([]);
+    }
+  };
+
 
   const handleGoToMainMenu = () => {
     navigate('/');
@@ -226,13 +331,20 @@ const SubsetSum: React.FC = () => {
     } else if (reconciliationStatus === 'calculating') {
       return (
         <p className="text-white flex items-center justify-center">
-            <Icon icon="line-md:loading-loop" className="mr-2 animate-spin" /> Buscando la combinación perfecta...
+            <Icon icon="line-md:loading-loop" className="mr-2 animate-spin" /> Buscando la combinación...
         </p>
       );
     } else if (reconciliationStatus === 'success') {
       return (
         <p className="text-white">
-          ¡Conciliación Exitosa! Estas transacciones suman exactamente {formatLempiras(targetAmount as number)}. Revisa la tabla...
+          ¡Conciliación Exacta Exitosa! Estas transacciones suman exactamente {formatLempiras(targetAmount as number)}. Revisa la tabla...
+        </p>
+      );
+    } else if (reconciliationStatus === 'approximateSuccess') {
+      return (
+        <p className="text-white">
+          ¡Coincidencia Aproximada Encontrada! Estas transacciones suman {formatLempiras(currentSumOfHighlighted as number)}.
+           Revisa la tabla...
         </p>
       );
     } else if (reconciliationStatus === 'failure') {
@@ -250,14 +362,14 @@ const SubsetSum: React.FC = () => {
       );
     }
     return null;
-  }, [reconciliationStatus, targetAmount]);
+  }, [reconciliationStatus, targetAmount, currentSumOfHighlighted]);
 
   // Mensaje de subconjuntos ya encontrados
   const foundSubsetsDisplayMessage = useMemo(() => {
     if (displayedSubsets.length === 0) {
       return null;
     }
-    const formattedSubsets = displayedSubsets.map((subset, index) => 
+    const formattedSubsets = displayedSubsets.map((subset, index) =>
       `     ${index + 1}.) {${subset.map(id => {
         const trans = transactionsById.get(id);
         return trans ? formatLempiras(trans.amount) : `ID:${id}`;
@@ -293,10 +405,23 @@ const SubsetSum: React.FC = () => {
             >
               {reconciliationStatus === 'calculating' ? (
                 <>
-                  <Icon icon="line-md:loading-loop" className="mr-2 animate-spin" /> Calculando...
+                  <Icon icon="line-md:loading-loop" className="mr-2 animate-spin" /> Calculando Exacto...
                 </>
               ) : (
                 'Encontrar Coincidencia Exacta'
+              )}
+            </button>
+            <button 
+              onClick={findApproximateMatch}
+              disabled={targetAmount === '' || targetAmount === 0 || reconciliationStatus === 'calculating'}
+              className="bg-[#18191d] text-[#a2bdd2] hover:bg-[#D50000] hover:text-[#ffffff] transition-colors duration-500 h-12 px-6 rounded-lg font-semibold flex items-center justify-center" 
+            >
+              {reconciliationStatus === 'calculating' ? (
+                <>
+                  <Icon icon="line-md:loading-loop" className="mr-2 animate-spin" /> Calculando Aproximado...
+                </>
+              ) : (
+                'Encontrar Coincidencia Aproximada'
               )}
             </button>
           </div>
@@ -315,7 +440,9 @@ const SubsetSum: React.FC = () => {
                 className={`p-4 rounded-md ${
                   reconciliationStatus === 'success' ? 'bg-green-600' : 
                   reconciliationStatus === 'failure' ? 'bg-red-600' : 
-                  reconciliationStatus === 'noMoreSubsets' ? 'bg-orange-600' : 'bg-blue-600'
+                  reconciliationStatus === 'noMoreSubsets' ? 'bg-orange-600' : 
+                  reconciliationStatus === 'approximateSuccess' ? 'bg-yellow-600' : // Nuevo color para aproximado
+                  'bg-blue-600'
                 }`}
               >
                 {statusMessage} 
@@ -323,7 +450,7 @@ const SubsetSum: React.FC = () => {
             )}
           </AnimatePresence>
 
-          {highlightedTransactions.length > 0 && reconciliationStatus === 'success' && (
+          {((highlightedTransactions.length > 0 && reconciliationStatus === 'success') || reconciliationStatus === 'approximateSuccess') && (
             <div className="text-right text-lg text-[#ffffff] font-semibold">
               Suma de Coincidencia: {formatLempiras(currentSumOfHighlighted)}
             </div>
