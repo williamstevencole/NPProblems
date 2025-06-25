@@ -31,7 +31,7 @@ const sampleTransactions: Transaction[] = [
   { id: 17, amount: 1300, date: "2024-05-31", description: "Impuesto de Propiedad" },
   { id: 18, amount: 450, date: "2024-06-01", description: "Reembolso Empleado" },
   { id: 19, amount: 3100, date: "2024-06-02", description: "Crédito Bancario" },
-  /* { id: 20, amount: 850, date: "2024-06-03", description: "Servicios de Limpieza" },
+  { id: 20, amount: 850, date: "2024-06-03", description: "Servicios de Limpieza" },
   { id: 21, amount: 1900, date: "2024-06-04", description: "Comisión por Ventas" },
   { id: 22, amount: 650, date: "2024-06-05", description: "Licencia de Software" },
   { id: 23, amount: 2400, date: "2024-06-06", description: "Inversión en Crypto Perrin Coin" },
@@ -41,7 +41,7 @@ const sampleTransactions: Transaction[] = [
   { id: 27, amount: 800, date: "2024-06-10", description: "Gastos de Viaje" },
   { id: 28, amount: 2100, date: "2024-06-11", description: "Pago de Nómina" },
   { id: 29, amount: 950, date: "2024-06-12", description: "Desarrollo Web (Fase: Abandonado)" },
-  { id: 30, amount: 1400, date: "2024-06-13", description: "Seguro Mensual" },
+  /*{ id: 30, amount: 1400, date: "2024-06-13", description: "Seguro Mensual" },
   { id: 31, amount: 550, date: "2024-06-14", description: "Recarga de Suministros" },
   { id: 32, amount: 2600, date: "2024-06-15", description: "Proyecto Secreto Messi" },
   { id: 33, amount: 1000, date: "2024-06-16", description: "Cuota de Membresía" },
@@ -76,27 +76,28 @@ const formatLempiras = (amount: number): string => {
 function generateSumsAndSubsetsExact(
   halfArray: Transaction[]
 ): Map<number, number[]> {
-  const allSumsAndSubsets: [number, number[]][] = [[0, []]]; // (suma, lista_de_ids)
+  let currentCombinations = [[0, []]] as [number, number[]][];
 
   for (const element of halfArray) {
-    const newAdditions: [number, number[]][] = [];
-    for (const [currentSum, currentSubsetIds] of allSumsAndSubsets) {
+    const nextCombinations: [number, number[]][] = [...currentCombinations]; 
+    for (const [currentSum, currentSubsetIds] of currentCombinations) {
       const newSum = currentSum + element.amount;
       const newSubsetIds = [...currentSubsetIds, element.id];
-      newAdditions.push([newSum, newSubsetIds]);
+      nextCombinations.push([newSum, newSubsetIds]); 
     }
-    allSumsAndSubsets.push(...newAdditions); // Añadir las nuevas combinaciones
+    currentCombinations = nextCombinations; 
   }
 
   // Convertir a un mapa, priorizando el subconjunto más corto si hay múltiples para la misma suma
   const sumsMap = new Map<number, number[]>();
-  for (const [s, sub] of allSumsAndSubsets) {
+  for (const [s, sub] of currentCombinations) {
     if (!sumsMap.has(s) || sub.length < (sumsMap.get(s)!).length) {
       sumsMap.set(s, sub);
     }
   }
   return sumsMap;
 }
+
 
 // **ALGORITMO APROXIMADO (Basado en subsetSumAproxWithHash de subsetSumAprox.py)**
 function generateSumsAndSubsetsApprox(
@@ -106,12 +107,10 @@ function generateSumsAndSubsetsApprox(
   sumsMap.set(0, []);
 
   for (const element of halfArray) {
-    // Tomar una instantánea de las entradas existentes antes de modificarlas
     const currentEntries = Array.from(sumsMap.entries());
     for (const [currentSum, currentSubsetIds] of currentEntries) {
       const newSum = currentSum + element.amount;
       const newSubsetIds = [...currentSubsetIds, element.id];
-      // Almacena solo si la nueva suma no existe O si el nuevo subconjunto es más corto
       if (!sumsMap.has(newSum) || newSubsetIds.length < (sumsMap.get(newSum)!).length) {
         sumsMap.set(newSum, newSubsetIds);
       }
@@ -138,8 +137,15 @@ const SubsetSum: React.FC = () => {
   const [currentlyProcessingId, setCurrentlyProcessingId] = useState<number | null>(null);
   const [foundSubsetsHistory, setFoundSubsetsHistory] = useState<Set<string>>(new Set());
   const [displayedSubsets, setDisplayedSubsets] = useState<number[][]>([]);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [isErrorToast, setIsErrorToast] = useState(false); 
+  const [lastUsedAlgorithm, setLastUsedAlgorithm] = useState<'exact' | 'approximate' | null>(null); 
 
   const navigate = useNavigate();
+
+  // Guardar el targetAmount anterior para compararlo
+  const prevTargetAmountRef = useRef<number | ''>('');
 
   // Memoizar los mapas de sumas para el algoritmo Exacto
   const { leftSumsMapExact, rightSumsMapExact } = useMemo(() => {
@@ -152,29 +158,62 @@ const SubsetSum: React.FC = () => {
     
     return { leftSumsMapExact: left, rightSumsMapExact: right };
   }, [transactions]);
-
   // Memoizar los mapas de sumas para el algoritmo Aproximado
   const { leftSumsMapApprox, rightSumsMapApprox } = useMemo(() => {
     const mid = Math.floor(transactions.length / 2);
     const leftHalf = transactions.slice(0, mid);
     const rightHalf = transactions.slice(mid);
-
     const left = generateSumsAndSubsetsApprox(leftHalf);
     const right = generateSumsAndSubsetsApprox(rightHalf);
-    
     return { leftSumsMapApprox: left, rightSumsMapApprox: right };
   }, [transactions]);
 
+  // Efecto para ocultar el toast automáticamente
+  useEffect(() => {
+    if (showToast) {
+      const timer = setTimeout(() => {
+        setShowToast(false);
+        setToastMessage('');
+      }, 3000); 
+      return () => clearTimeout(timer);
+    }
+  }, [showToast]);
 
-  // Al cambiar el targetAmount, reiniciar estados relevantes
-  const handleTargetAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setTargetAmount(value === '' ? '' : Number(value));
+  // Efecto para actualizar prevTargetAmountRef
+  useEffect(() => {
+    prevTargetAmountRef.current = targetAmount;
+  }, [targetAmount]);
+
+
+  // Función para mostrar el toast
+  const showToastMessage = (message: string, isError: boolean = false) => {
+    setToastMessage(message);
+    setIsErrorToast(isError);
+    setShowToast(true);
+  };
+
+  // Función para resetear solo los estados de la ejecución actual (visuales)
+  const resetExecutionState = () => {
     setReconciliationStatus('idle');
     setHighlightedTransactions([]);
     setCurrentlyProcessingId(null);
-    setFoundSubsetsHistory(new Set()); 
-    setDisplayedSubsets([]); 
+  };
+
+  // Función para resetear el historial de subconjuntos y los estados de ejecución
+  const resetHistoryAndExecutionState = () => {
+    resetExecutionState();
+    setFoundSubsetsHistory(new Set());
+    setDisplayedSubsets([]);
+  };
+
+  // Al cambiar el targetAmount, reiniciar todos los estados
+  const handleTargetAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setTargetAmount(value === '' ? '' : Number(value));
+    
+    // Reseteo completo cuando el monto cambia, y también el último algoritmo usado
+    resetHistoryAndExecutionState();
+    setLastUsedAlgorithm(null); // Resetear también el algoritmo usado
   };
   
   const currentSumOfHighlighted = useMemo(() => {
@@ -186,15 +225,17 @@ const SubsetSum: React.FC = () => {
 
   // Función para encontrar coincidencia EXACTA (Implementación de Meet-in-the-Middle)
   const findExactMatch = async () => {
+    // Verificar si el targetAmount ha cambiado o si el algoritmo anterior era diferente
+    if (targetAmount !== prevTargetAmountRef.current || lastUsedAlgorithm !== 'exact') {
+      resetHistoryAndExecutionState();
+    }
+    setLastUsedAlgorithm('exact'); 
+
     if (targetAmount === '' || typeof targetAmount !== 'number' || targetAmount <= 0) { 
-      setReconciliationStatus('idle');
-      setHighlightedTransactions([]);
-      setCurrentlyProcessingId(null);
+      showToastMessage("Debe ingresar una cantidad NO NEGATIVA antes de continuar.", true);
       return;
     }
     setReconciliationStatus('calculating');
-    setHighlightedTransactions([]);
-    setCurrentlyProcessingId(null); 
     const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
     const animationDelay = 100;
     // Simular recorrido inicial de transacciones para animación
@@ -253,22 +294,23 @@ const SubsetSum: React.FC = () => {
 
   // Función para encontrar coincidencia APROXIMADA (Implementación de Meet-in-the-Middle "aproximado")
   const findApproximateMatch = async () => {
+    if (targetAmount !== prevTargetAmountRef.current || lastUsedAlgorithm !== 'approximate') {
+      resetHistoryAndExecutionState();
+    }
+    setLastUsedAlgorithm('approximate'); 
+
     if (targetAmount === '' || typeof targetAmount !== 'number' || targetAmount <= 0) {
-      setReconciliationStatus('idle');
-      setHighlightedTransactions([]);
-      setCurrentlyProcessingId(null);
+      showToastMessage("Debe ingresar una cantidad NO NEGATIVA antes de continuar.", true);
       return;
     }
     setReconciliationStatus('calculating');
-    setHighlightedTransactions([]);
-    setCurrentlyProcessingId(null);
     const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
     const animationDelay = 100;
 
     // Simular procesamiento
     for (const transaction of transactions) {
       setCurrentlyProcessingId(transaction.id);
-      await delay(animationDelay / 2); // Un poco más rápido para la aproximación visual
+      await delay(animationDelay / 2); 
     }
     setCurrentlyProcessingId(null);
 
@@ -337,14 +379,14 @@ const SubsetSum: React.FC = () => {
     } else if (reconciliationStatus === 'success') {
       return (
         <p className="text-white">
-          ¡Conciliación Exacta Exitosa! Estas transacciones suman exactamente {formatLempiras(targetAmount as number)}. Revisa la tabla...
+          ¡Conciliación Exitosa (Algoritmo Exacto)! Estas transacciones suman exactamente {formatLempiras(targetAmount as number)}. Revisa la tabla...
         </p>
       );
     } else if (reconciliationStatus === 'approximateSuccess') {
       return (
         <p className="text-white">
-          ¡Coincidencia Aproximada Encontrada! Estas transacciones suman {formatLempiras(currentSumOfHighlighted as number)}.
-           Revisa la tabla...
+          ¡Coincidencia Encontrada (Algoritmo Aproximado)! Estas transacciones suman {formatLempiras(currentSumOfHighlighted as number)}.
+            Revisa la tabla...
         </p>
       );
     } else if (reconciliationStatus === 'failure') {
@@ -384,10 +426,25 @@ const SubsetSum: React.FC = () => {
   }, [displayedSubsets, targetAmount]);
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#18191d] via-[#2a3b4e] to-[#18191d] bg-fixed bg-cover animate-water-flow text-[#a2bdd2] p-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#18191d] via-[#2a3b4e] to-[#18191d] bg-fixed bg-cover animate-water-flow text-[#a2bdd2] p-8 relative"> {/* Added relative for toast positioning */}
+      {/* Toast Component */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -50, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.3 }}
+            className={`fixed top-4 left-1/2 z-50 p-4 rounded-md shadow-lg text-white font-semibold ${isErrorToast ? 'bg-red-500' : 'bg-green-500'}`}
+          >
+            {toastMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <Card className="max-w-4xl mx-auto bg-[#495970] shadow-xl bg-opacity-90 backdrop-blur-sm">
         <div className="p-6 space-y-6">
-          <h1 className="text-2xl font-bold text-[#ffffff] mb-4">Simulador de Reconciliación Bancaria</h1>
+          <h1 className="text-4xl text-center font-bold text-[#ffffff] mb-8 ">Simulador de Reconciliación Bancaria</h1>
           
           <div className="flex items-end space-x-4">
             <input
@@ -395,33 +452,33 @@ const SubsetSum: React.FC = () => {
               placeholder="Ingrese el monto. Por ejemplo: 1000"
               value={targetAmount !== '' ? targetAmount.toString() : ''} 
               onChange={handleTargetAmountChange}
-              className="flex-grow h-12 text-center text-[#a2bdd2] bg-[#18191d] bg-opacity-50 rounded-lg px-3 py-2
-                         focus:outline-none focus:ring-2 focus:ring-[#a2bdd2] transition-all duration-300 placeholder-[#a2bdd2] placeholder-opacity-70"
+              className="flex-grow h-16 text-center text-[#a2bdd2] bg-[#18191d] bg-opacity-50 rounded-lg px-3 py-2
+                          focus:outline-none focus:ring-2 focus:ring-[#a2bdd2] transition-all duration-300 placeholder-[#a2bdd2] placeholder-opacity-70"
             />
             <button 
               onClick={findExactMatch} 
-              disabled={targetAmount === '' || targetAmount === 0 || reconciliationStatus === 'calculating'}
-              className="bg-[#18191d] text-[#a2bdd2] hover:bg-[#a2bdd2] hover:text-[#18191d] transition-colors duration-500 h-12 px-6 rounded-lg font-semibold flex items-center justify-center" 
+              disabled={reconciliationStatus === 'calculating'} // Disable based only on calculating status
+              className="bg-[#18191d] text-[#a2bdd2] hover:bg-[#60A5FA] hover:text-[#18191d] transition-colors duration-500 h-16 px-6 rounded-lg font-semibold flex items-center justify-center" 
             >
               {reconciliationStatus === 'calculating' ? (
                 <>
                   <Icon icon="line-md:loading-loop" className="mr-2 animate-spin" /> Calculando Exacto...
                 </>
               ) : (
-                'Encontrar Coincidencia Exacta'
+                'Encontrar Coincidencia con el Algoritmo Exacto'
               )}
             </button>
             <button 
               onClick={findApproximateMatch}
-              disabled={targetAmount === '' || targetAmount === 0 || reconciliationStatus === 'calculating'}
-              className="bg-[#18191d] text-[#a2bdd2] hover:bg-[#D50000] hover:text-[#ffffff] transition-colors duration-500 h-12 px-6 rounded-lg font-semibold flex items-center justify-center" 
+              disabled={reconciliationStatus === 'calculating'} // Disable based only on calculating status
+              className="bg-[#18191d] text-[#a2bdd2] hover:bg-[#D50000] hover:text-[#ffffff] transition-colors duration-500 h-16 px-6 rounded-lg font-semibold flex items-center justify-center" 
             >
               {reconciliationStatus === 'calculating' ? (
                 <>
                   <Icon icon="line-md:loading-loop" className="mr-2 animate-spin" /> Calculando Aproximado...
                 </>
               ) : (
-                'Encontrar Coincidencia Aproximada'
+                'Encontrar Coincidencia con el Algoritmo Aproximado'
               )}
             </button>
           </div>
@@ -441,7 +498,7 @@ const SubsetSum: React.FC = () => {
                   reconciliationStatus === 'success' ? 'bg-green-600' : 
                   reconciliationStatus === 'failure' ? 'bg-red-600' : 
                   reconciliationStatus === 'noMoreSubsets' ? 'bg-orange-600' : 
-                  reconciliationStatus === 'approximateSuccess' ? 'bg-yellow-600' : // Nuevo color para aproximado
+                  reconciliationStatus === 'approximateSuccess' ? 'bg-green-600' : 
                   'bg-blue-600'
                 }`}
               >
