@@ -439,7 +439,7 @@ export default function GraphBuilder({
           colores={dataBacktracking.colores_usados}
           tiempo={dataBacktracking.tiempo}
           autor="William Cole"
-          description="Este algoritmo realiza una búsqueda exhaustiva por retroceso, garantizando una solución óptima aunque costosa en tiempo."
+          description="Tiempo de Ejecucion: O(n*m^n) en el peor de los casos y O(n+m) para grafos no densos y O(n^2) para grafos densos"
           onClose={() => {
             setMostrarInfoBack(false);
             setDialogoActivo([
@@ -461,7 +461,7 @@ export default function GraphBuilder({
           colores={dataGFG.colores_usados}
           tiempo={dataGFG.tiempo}
           autor="Raja Ramakrishna"
-          description="Este algoritmo implementa una versión heurística de coloración. Es más rápido pero no asegura siempre la solución óptima."
+          description="Tiempo de Ejecucion: O(n*m^n) en el peor de los casos y O(n^2) en el mejor de los casos"
           onClose={() => {
             setMostrarInfoGFG(false);
             setDialogoActivo([
