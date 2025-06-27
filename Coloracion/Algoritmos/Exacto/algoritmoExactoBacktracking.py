@@ -1,15 +1,14 @@
 V = 4 # Number of vertices
 
 def print_solution(color):
-    print("Solution Exists: Following are the assigned colors")
-    print(" ".join(map(str, color)))
+    print("Solution Exists: Following are the assigned colors") # -> c 
+    print(" ".join(map(str, color))) # -> n (itera sobre todos los colores)
 
 def is_safe(v, graph, color, c):
-    # Check if the color 'c' is safe for the vertex 'v'
-    for i in range(V):
-        if graph[v][i] and c == color[i]:
-            return False
-    return True
+    for i in range(V): #->
+        if graph[v][i] and c == color[i]: # -> c
+            return False # -> c
+    return True # -> c
 
 def graph_coloring_util(graph, m, color, v):
     # Base case: If all vertices are assigned a color, return true
